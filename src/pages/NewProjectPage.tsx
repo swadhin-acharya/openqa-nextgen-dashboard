@@ -32,29 +32,20 @@ export default function NewProjectPage() {
     setSubmitting(true)
     setError(null)
 
-    // Two sequential inserts from the browser, each permitted by RLS
-    // (projects.insert checks owner_id = auth.uid(); project_members.insert
-    // checks user_id = auth.uid()). Not wrapped in a DB transaction for this
-    // demo - a Postgres RPC function would be the hardening step later.
-    const { data: project, error: projectError } = await supabase
-      .from('projects')
-      .insert({ name: name.trim(), slug, owner_id: session.user.id })
-      .select('id, slug')
-      .single()
-
-    if (projectError || !project) {
-      setSubmitting(false)
-      setError(projectError?.code === '23505' ? 'That project slug is already taken' : projectError?.message ?? 'Failed to create project')
-      return
-    }
-
-    const { error: memberError } = await supabase
-      .from('project_members')
-      .insert({ project_id: project.id, user_id: session.user.id, role: 'owner' })
+    // Atomic via a SECURITY DEFINER RPC (supabase/migrations/0003_create_project_rpc.sql).
+    // Two sequential client-side inserts (projects, then project_members)
+    // don't work here: `.select().single()` on the projects insert triggers
+    // RETURNING, which Postgres also checks against the SELECT policy - and
+    // that policy requires a project_members row that doesn't exist until
+    // the second insert. The RPC does both inserts server-side in one call.
+    const { data: project, error: rpcError } = await supabase.rpc('create_project', {
+      p_name: name.trim(),
+      p_slug: slug,
+    })
 
     setSubmitting(false)
-    if (memberError) {
-      setError(memberError.message)
+    if (rpcError || !project) {
+      setError(rpcError?.code === '23505' ? 'That project slug is already taken' : rpcError?.message ?? 'Failed to create project')
       return
     }
 
