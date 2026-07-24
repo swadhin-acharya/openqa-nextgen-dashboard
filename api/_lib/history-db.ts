@@ -1,6 +1,6 @@
-import type { HistoryState, FailureHistoryState } from '../../processor/history'
-import type { DashboardData } from '../../processor/dashboard-data'
-import { getServiceRoleClient } from './db'
+import type { HistoryState, FailureHistoryState } from '../../processor/history.js'
+import type { DashboardData } from '../../processor/dashboard-data.js'
+import { getServiceRoleClient } from './db.js'
 
 /**
  * Postgres-backed replacement for processor/history.ts's loadHistory(dataDir)

@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
-import type { TestStatus } from './models'
+import type { TestStatus } from './models.js'
 
 export interface AllureLabel {
   name: string

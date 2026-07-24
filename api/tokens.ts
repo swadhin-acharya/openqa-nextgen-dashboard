@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getServiceRoleClient } from './_lib/db'
-import { extractBearerToken, generatePat } from './_lib/pat'
+import { getServiceRoleClient } from './_lib/db.js'
+import { extractBearerToken, generatePat } from './_lib/pat.js'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {

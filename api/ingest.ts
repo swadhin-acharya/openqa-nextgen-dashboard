@@ -3,9 +3,9 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import * as tar from 'tar'
-import { getServiceRoleClient } from './_lib/db'
-import { extractBearerToken, hashPat } from './_lib/pat'
-import { processExecutionForProject } from './_lib/processExecutionForProject'
+import { getServiceRoleClient } from './_lib/db.js'
+import { extractBearerToken, hashPat } from './_lib/pat.js'
+import { processExecutionForProject } from './_lib/processExecutionForProject.js'
 
 async function readRawBody(req: VercelRequest): Promise<Buffer> {
   const chunks: Buffer[] = []

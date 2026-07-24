@@ -7,7 +7,7 @@ import type {
   FailureSummary,
   CategorySummary,
   EnvironmentInfo,
-} from './models'
+} from './models.js'
 
 export interface DashboardData {
   summary: SummaryData

@@ -1,5 +1,5 @@
-import type { RawAllureData, AllureResult } from './reader'
-import { getFeatureLabel, getSeverityLabel } from './reader'
+import type { RawAllureData, AllureResult } from './reader.js'
+import { getFeatureLabel, getSeverityLabel } from './reader.js'
 import type {
   ExecutionSummary,
   FeatureSummary,
@@ -9,7 +9,7 @@ import type {
   ExecutorInfo,
   StatusCounts,
   TestStatus,
-} from './models'
+} from './models.js'
 
 const EMPTY_COUNTS: StatusCounts = { total: 0, passed: 0, failed: 0, broken: 0, skipped: 0, unknown: 0 }
 

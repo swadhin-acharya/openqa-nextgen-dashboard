@@ -7,13 +7,18 @@ dashboard's build-time Allure processor). `dashboard-data.ts` is the
 into its own file since `writer.ts`'s two functions are the file-I/O boundary
 this SaaS ingestion path replaces with Postgres (see `api/_lib/history-db.ts`).
 
-**Intentional edit**: relative import specifiers had their `.js` suffixes
-stripped (`./models.js` → `./models`, `./reader.js` → `./reader`). The source
-repo uses TypeScript's NodeNext module resolution, where `.js`-suffixed
-specifiers in `.ts` source are required and resolve to the eventual compiled
-output. This repo uses `bundler` moduleResolution (Vite on the frontend,
-`@vercel/node`'s esbuild-based bundler for `/api`), where extension-less
-specifiers are the correct convention instead. No other line was touched.
+**No edits**: these 4 files are byte-identical to
+`resideo-nextgen-dashboard/processor/src`, including their `.js`-suffixed
+relative imports (`./models.js`, `./reader.js`). An earlier version of this
+vendoring stripped those suffixes on the (wrong) assumption that Vercel's
+`/api` build bundles imports the way Vite does. It doesn't: Vercel's Node
+runtime transpiles each `.ts` file individually and runs the result with
+plain Node ESM, which requires the exact `.js`-suffixed specifier to resolve
+- extension-less imports fail at runtime with `ERR_MODULE_NOT_FOUND` (caught
+by actually deploying and hitting `/api/ingest`, not by local type-checking,
+since `moduleResolution: bundler` happily accepts either form). So `.js`
+suffixes are correct and required here, same as the source repo, and every
+`api/*.ts`/`api/_lib/*.ts` file's own relative imports use them too.
 
 This is intentional short-term duplication, not an architecture pattern to
 replicate: these files have zero npm dependencies (pure `node:fs`/`node:path`),

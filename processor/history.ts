@@ -7,7 +7,7 @@ import type {
   TestSummary,
   FailureSummary,
   ComparisonMetric,
-} from './models'
+} from './models.js'
 
 export interface HistoryState {
   executions: RecentExecutionRow[] // newest first

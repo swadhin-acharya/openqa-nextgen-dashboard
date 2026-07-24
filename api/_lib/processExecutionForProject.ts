@@ -1,13 +1,13 @@
-import { readAllureResults } from '../../processor/reader'
+import { readAllureResults } from '../../processor/reader.js'
 import {
   buildExecutionSummary,
   buildFeatureSummaries,
   buildTestSummaries,
   buildCategorySummaries,
-} from '../../processor/normalize'
-import { mergeExecutionHistory, computeComparison, mergeFailureHistory } from '../../processor/history'
-import type { DashboardData } from '../../processor/dashboard-data'
-import { loadHistoryFromDb, loadFailureHistoryStateFromDb, writeDashboardDataToDb } from './history-db'
+} from '../../processor/normalize.js'
+import { mergeExecutionHistory, computeComparison, mergeFailureHistory } from '../../processor/history.js'
+import type { DashboardData } from '../../processor/dashboard-data.js'
+import { loadHistoryFromDb, loadFailureHistoryStateFromDb, writeDashboardDataToDb } from './history-db.js'
 
 export interface ProcessExecutionForProjectOptions {
   projectId: string
