@@ -7,13 +7,15 @@ import { getServiceRoleClient } from './_lib/db.js'
 import { extractBearerToken, hashPat } from './_lib/pat.js'
 import { processExecutionForProject } from './_lib/processExecutionForProject.js'
 
-async function readRawBody(req: VercelRequest): Promise<Buffer> {
-  const chunks: Buffer[] = []
-  for await (const chunk of req) {
-    chunks.push(chunk as Buffer)
-  }
-  return Buffer.concat(chunks)
-}
+// Body is JSON { archive: "<base64 gzip tarball>" }, not a raw binary POST
+// body. Vercel's Node runtime does its own body handling ahead of the
+// handler for non-JSON content types, and empirically (confirmed by
+// deploying and testing, not documented) it mangles arbitrary binary
+// payloads - a plain-text body round-trips fine but a real gzip tarball
+// came out corrupted before reaching this code. application/json is the
+// one content type Vercel's runtime reliably parses as-is, and base64
+// round-trips perfectly through JSON string encoding, so wrapping the
+// archive that way sidesteps the raw-binary-body ambiguity entirely.
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -49,11 +51,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   let tmpDir: string | null = null
   try {
-    const body = await readRawBody(req)
-    if (body.length === 0) {
-      res.status(400).json({ error: 'Empty request body - expected a gzip tarball of allure-results' })
+    const archive = req.body?.archive
+    if (typeof archive !== 'string' || archive.length === 0) {
+      res.status(400).json({ error: 'Expected JSON body { archive: "<base64 gzip tarball of allure-results>" }' })
       return
     }
+    const body = Buffer.from(archive, 'base64')
 
     // Vercel container filesystems can be reused across warm invocations -
     // the finally block below always removes this before returning.
