@@ -15,13 +15,12 @@ export interface NavItem {
   label: string
   path: string
   icon: SvgIconComponent
-  /** Only Overview is implemented in Milestone 1; others are shown but disabled. */
   enabled: boolean
 }
 
 export const navItems: NavItem[] = [
   { label: 'Overview', path: '/', icon: GridViewRoundedIcon, enabled: true },
-  { label: 'Executions', path: '/executions', icon: PlayCircleOutlineRoundedIcon, enabled: false },
+  { label: 'Executions', path: '/executions', icon: PlayCircleOutlineRoundedIcon, enabled: true },
   { label: 'Features', path: '/features', icon: CategoryRoundedIcon, enabled: false },
   { label: 'Tests', path: '/tests', icon: FactCheckRoundedIcon, enabled: false },
   { label: 'Failure Analysis', path: '/failure-analysis', icon: ReportProblemRoundedIcon, enabled: false },
@@ -29,6 +28,8 @@ export const navItems: NavItem[] = [
   { label: 'Retries', path: '/retries', icon: ReplayRoundedIcon, enabled: false },
   { label: 'Trends', path: '/trends', icon: TrendingUpRoundedIcon, enabled: false },
   { label: 'History', path: '/history', icon: HistoryRoundedIcon, enabled: false },
-  { label: 'Reports', path: '/reports', icon: DescriptionRoundedIcon, enabled: false },
+  // Aliases the Executions list - this product's mental model has no
+  // separate "report definition" concept; a report IS an execution's report.
+  { label: 'Reports', path: '/executions', icon: DescriptionRoundedIcon, enabled: true },
   { label: 'Environment', path: '/environment', icon: PublicRoundedIcon, enabled: false },
 ]

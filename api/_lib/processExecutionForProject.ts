@@ -47,10 +47,10 @@ const DEFAULT_HISTORY_LIMIT = 50
  * on that trimming to bound growth. */
 const META_RETENTION_LIMIT = 50
 
-function trimToRecent<T extends { executedAt: string }>(map: Record<string, T>, limit: number): Record<string, T> {
+function trimToRecent<T extends { date: string }>(map: Record<string, T>, limit: number): Record<string, T> {
   return Object.fromEntries(
     Object.entries(map)
-      .sort((a, b) => new Date(b[1].executedAt).getTime() - new Date(a[1].executedAt).getTime())
+      .sort((a, b) => new Date(b[1].date).getTime() - new Date(a[1].date).getTime())
       .slice(0, limit),
   )
 }
@@ -105,7 +105,17 @@ export async function processExecutionForProject(
     suiteId,
     branch,
     executedByEmail: options.executedByEmail ?? null,
-    executedAt: execution.startTime,
+    mergedIntoMainDashboard,
+    status: execution.status,
+    total: execution.total,
+    passed: execution.passed,
+    failed: execution.failed,
+    broken: execution.broken,
+    skipped: execution.skipped,
+    unknown: execution.unknown,
+    passRate: execution.passRate,
+    duration: execution.duration,
+    date: execution.startTime,
   }
 
   const existingMeta = await loadExecutionsMetaFromDb(options.projectId)

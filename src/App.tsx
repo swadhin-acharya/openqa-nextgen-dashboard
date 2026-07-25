@@ -9,6 +9,8 @@ import OrgShell from './pages/OrgShell'
 import OrgHomePage from './pages/OrgHomePage'
 import ProjectShell from './pages/ProjectShell'
 import ProjectOverviewPage from './pages/ProjectOverviewPage'
+import ProjectExecutionsPage from './pages/ProjectExecutionsPage'
+import ExecutionReportPage from './pages/ExecutionReportPage'
 import TokensPage from './pages/TokensPage'
 
 export default function App() {
@@ -44,6 +46,8 @@ export default function App() {
         <Route path="projects/new" element={<NewProjectPage />} />
         <Route path=":projectSlug" element={<ProjectShell />}>
           <Route index element={<ProjectOverviewPage />} />
+          <Route path="executions" element={<ProjectExecutionsPage />} />
+          <Route path="executions/:executionId" element={<ExecutionReportPage />} />
           <Route path="tokens" element={<TokensPage />} />
         </Route>
       </Route>

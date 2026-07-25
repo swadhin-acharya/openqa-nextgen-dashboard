@@ -1,13 +1,20 @@
 import type { HistoryState, FailureHistoryState } from '../../processor/history.js'
 import type { DashboardData } from '../../processor/dashboard-data.js'
-import type { TestSummary } from '../../processor/models.js'
+import type { TestSummary, RecentExecutionRow } from '../../processor/models.js'
 import { getServiceRoleClient } from './db.js'
 
-export interface ExecutionMeta {
+/**
+ * Mirrors RecentExecutionRow's stats (total/passed/failed/.../duration/date)
+ * so the Executions page has a full summary for EVERY execution, not just
+ * the ones that made it into the vendored aggregate's `executions` array
+ * (which only ever holds main-branch runs - see
+ * processExecutionForProject.ts).
+ */
+export interface ExecutionMeta extends Omit<RecentExecutionRow, 'executionId'> {
   suiteId: string | null
   branch: string | null
   executedByEmail: string | null
-  executedAt: string
+  mergedIntoMainDashboard: boolean
 }
 
 export type ExecutionsMeta = Record<string, ExecutionMeta>
