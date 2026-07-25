@@ -6,13 +6,16 @@ import { supabase } from './supabaseClient'
 interface AuthContextValue {
   session: Session | null
   loading: boolean
+  /** profiles.is_admin for the current session - null while still resolving. */
+  isAdmin: boolean | null
 }
 
-const AuthContext = createContext<AuthContextValue>({ session: null, loading: true })
+const AuthContext = createContext<AuthContextValue>({ session: null, loading: true, isAdmin: null })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -27,7 +30,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.subscription.unsubscribe()
   }, [])
 
-  return <AuthContext.Provider value={{ session, loading }}>{children}</AuthContext.Provider>
+  useEffect(() => {
+    if (!session) {
+      setIsAdmin(null)
+      return
+    }
+    supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', session.user.id)
+      .maybeSingle()
+      .then(({ data }) => setIsAdmin(data?.is_admin ?? false))
+  }, [session])
+
+  return <AuthContext.Provider value={{ session, loading, isAdmin }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {

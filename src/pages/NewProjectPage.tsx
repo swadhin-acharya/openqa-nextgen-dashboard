@@ -1,9 +1,8 @@
-import { useState, type ChangeEvent, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Box, Container, Paper, TextField, Button, Typography, Alert, Stack, Avatar } from '@mui/material'
-import UploadRoundedIcon from '@mui/icons-material/UploadRounded'
+import { useState, type FormEvent } from 'react'
+import { Navigate, useNavigate } from 'react-router-dom'
+import { Box, Container, Paper, TextField, Button, Typography, Alert, Stack } from '@mui/material'
 import { supabase } from '../lib/supabaseClient'
-import { useAuth } from '../lib/AuthContext'
+import { useOrg } from '../lib/OrgContext'
 
 function slugify(name: string): string {
   return name
@@ -13,33 +12,19 @@ function slugify(name: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
-/** Uploads to project-logos/<project_id>/logo.<ext> and returns its public URL. */
-async function uploadProjectLogo(projectId: string, file: File): Promise<string | null> {
-  const ext = file.name.split('.').pop()?.toLowerCase() ?? 'png'
-  const path = `${projectId}/logo.${ext}`
-  const { error } = await supabase.storage.from('project-logos').upload(path, file, { upsert: true })
-  if (error) return null
-  return supabase.storage.from('project-logos').getPublicUrl(path).data.publicUrl
-}
-
 export default function NewProjectPage() {
-  const { session } = useAuth()
+  const org = useOrg()
   const navigate = useNavigate()
   const [name, setName] = useState('')
-  const [logoFile, setLogoFile] = useState<File | null>(null)
-  const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  function handleLogoChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0] ?? null
-    setLogoFile(file)
-    setLogoPreview(file ? URL.createObjectURL(file) : null)
-  }
+  // Membership is org-level only - only that org's owner can create projects
+  // inside it (supabase/migrations/0005_org_project_hierarchy.sql).
+  if (org.role !== 'owner') return <Navigate to={`/${org.slug}`} replace />
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!session) return
 
     const slug = slugify(name)
     if (!slug) {
@@ -50,34 +35,21 @@ export default function NewProjectPage() {
     setSubmitting(true)
     setError(null)
 
-    // Atomic via a SECURITY DEFINER RPC (supabase/migrations/0003_create_project_rpc.sql).
-    // Two sequential client-side inserts (projects, then project_members)
-    // don't work here: `.select().single()` on the projects insert triggers
-    // RETURNING, which Postgres also checks against the SELECT policy - and
-    // that policy requires a project_members row that doesn't exist until
-    // the second insert. The RPC does both inserts server-side in one call.
     const { data: project, error: rpcError } = await supabase.rpc('create_project', {
+      p_org_id: org.orgId,
       p_name: name.trim(),
       p_slug: slug,
     })
 
+    setSubmitting(false)
     if (rpcError || !project) {
-      setSubmitting(false)
-      setError(rpcError?.code === '23505' ? 'That project slug is already taken' : rpcError?.message ?? 'Failed to create project')
+      setError(
+        rpcError?.code === '23505' ? 'That project slug is already taken in this organization' : rpcError?.message ?? 'Failed to create project',
+      )
       return
     }
 
-    // Logo upload is best-effort - a failure here shouldn't block navigating
-    // into the project that was already successfully created.
-    if (logoFile) {
-      const logoUrl = await uploadProjectLogo(project.id, logoFile)
-      if (logoUrl) {
-        await supabase.from('projects').update({ logo_url: logoUrl }).eq('id', project.id)
-      }
-    }
-
-    setSubmitting(false)
-    navigate(`/${project.slug}`)
+    navigate(`/${org.slug}/${project.slug}`)
   }
 
   return (
@@ -87,31 +59,20 @@ export default function NewProjectPage() {
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
             New project
           </Typography>
-          <Stack spacing={2} sx={{ mt: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Inside {org.name}
+          </Typography>
+          <Stack spacing={2}>
             {error && <Alert severity="error">{error}</Alert>}
             <TextField
               label="Project name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              helperText={name ? `URL: /${slugify(name)}` : ' '}
+              helperText={name ? `URL: /${org.slug}/${slugify(name)}` : ' '}
               required
               fullWidth
               autoFocus
             />
-
-            <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-              <Avatar src={logoPreview ?? undefined} variant="rounded" sx={{ width: 48, height: 48 }} />
-              <Button
-                component="label"
-                variant="outlined"
-                size="small"
-                startIcon={<UploadRoundedIcon sx={{ fontSize: 16 }} />}
-              >
-                {logoFile ? 'Change logo' : 'Add logo (optional)'}
-                <input type="file" accept="image/*" hidden onChange={handleLogoChange} />
-              </Button>
-            </Stack>
-
             <Button type="submit" variant="contained" disabled={submitting} fullWidth>
               {submitting ? 'Creating…' : 'Create project'}
             </Button>

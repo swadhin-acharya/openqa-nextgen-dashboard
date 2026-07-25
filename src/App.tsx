@@ -3,7 +3,10 @@ import { RequireAuth } from './lib/AuthContext'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import HomePage from './pages/HomePage'
+import NewOrgPage from './pages/NewOrgPage'
 import NewProjectPage from './pages/NewProjectPage'
+import OrgShell from './pages/OrgShell'
+import OrgHomePage from './pages/OrgHomePage'
 import ProjectShell from './pages/ProjectShell'
 import ProjectOverviewPage from './pages/ProjectOverviewPage'
 import TokensPage from './pages/TokensPage'
@@ -22,23 +25,27 @@ export default function App() {
         }
       />
       <Route
-        path="/projects/new"
+        path="/orgs/new"
         element={
           <RequireAuth>
-            <NewProjectPage />
+            <NewOrgPage />
           </RequireAuth>
         }
       />
       <Route
-        path="/:slug"
+        path="/:orgSlug"
         element={
           <RequireAuth>
-            <ProjectShell />
+            <OrgShell />
           </RequireAuth>
         }
       >
-        <Route index element={<ProjectOverviewPage />} />
-        <Route path="tokens" element={<TokensPage />} />
+        <Route index element={<OrgHomePage />} />
+        <Route path="projects/new" element={<NewProjectPage />} />
+        <Route path=":projectSlug" element={<ProjectShell />}>
+          <Route index element={<ProjectOverviewPage />} />
+          <Route path="tokens" element={<TokensPage />} />
+        </Route>
       </Route>
     </Routes>
   )

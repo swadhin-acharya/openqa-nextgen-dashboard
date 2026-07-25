@@ -45,7 +45,7 @@ export default function ProjectOverviewPage() {
             No test runs ingested yet. Generate a token from the Tokens page and POST allure-results to{' '}
             <code>/api/ingest</code>.
           </Typography>
-          <Button component={RouterLink} to={`/${project.slug}/tokens`} variant="outlined" size="small">
+          <Button component={RouterLink} to="tokens" variant="outlined" size="small">
             Go to Tokens
           </Button>
         </Stack>

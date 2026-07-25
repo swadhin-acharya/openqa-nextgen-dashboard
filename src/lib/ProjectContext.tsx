@@ -3,12 +3,12 @@ import { useParams } from 'react-router-dom'
 import { Box, Container, Typography, Button, CircularProgress } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import { supabase } from './supabaseClient'
+import { useOrg } from './OrgContext'
 
 export interface ProjectContextValue {
   projectId: string
   name: string
   slug: string
-  logoUrl: string | null
   /** dashboard_data.updated_at for this project, or null if no run has been ingested yet. */
   lastUpdated: string | null
 }
@@ -27,15 +27,15 @@ type LoadState =
   | { status: 'ready'; value: ProjectContextValue }
 
 /**
- * Resolves the :slug route param to a project (RLS-gated - a non-member
- * querying a real slug gets zero rows, not the project's data, same as
- * supabase/migrations/0001_init.sql's "members can read their projects"
- * policy) and provides it via context so nested pages (Overview, Tokens)
- * don't each re-resolve it. Renders loading/not-found states itself so
- * children can assume a resolved project.
+ * Resolves the :projectSlug route param to a project *within the current
+ * org* (see useOrg() - this must render inside an OrgProvider). Membership
+ * is org-level only (supabase/migrations/0005_org_project_hierarchy.sql),
+ * so is_org_member() already gated access at the OrgProvider level; this
+ * only needs to find the project row itself.
  */
 export function ProjectProvider({ children }: { children: ReactNode }) {
-  const { slug } = useParams<{ slug: string }>()
+  const org = useOrg()
+  const { projectSlug } = useParams<{ projectSlug: string }>()
   const [state, setState] = useState<LoadState>({ status: 'loading' })
 
   useEffect(() => {
@@ -46,8 +46,9 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
 
       const { data: project } = await supabase
         .from('projects')
-        .select('id, name, slug, logo_url')
-        .eq('slug', slug)
+        .select('id, name, slug')
+        .eq('org_id', org.orgId)
+        .eq('slug', projectSlug)
         .maybeSingle()
 
       if (cancelled) return
@@ -69,7 +70,6 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
           projectId: project.id,
           name: project.name,
           slug: project.slug,
-          logoUrl: project.logo_url,
           lastUpdated: dashboardRow?.updated_at ?? null,
         },
       })
@@ -79,7 +79,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true
     }
-  }, [slug])
+  }, [org.orgId, projectSlug])
 
   if (state.status === 'loading') {
     return (
@@ -96,10 +96,10 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
           Not found
         </Typography>
         <Typography color="text.secondary" sx={{ mb: 3 }}>
-          This project doesn't exist, or you're not a member of it.
+          This project doesn't exist in {org.name}.
         </Typography>
-        <Button component={RouterLink} to="/" variant="outlined">
-          Back to projects
+        <Button component={RouterLink} to={`/${org.slug}`} variant="outlined">
+          Back to {org.name}
         </Button>
       </Container>
     )

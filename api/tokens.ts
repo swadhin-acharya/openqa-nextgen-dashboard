@@ -32,10 +32,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   const userId = userData.user.id
 
+  // Membership is org-level only (supabase/migrations/0005_org_project_hierarchy.sql)
+  // - resolve the project's parent org, then check org_members for it.
+  const { data: project, error: projectError } = await supabase
+    .from('projects')
+    .select('org_id')
+    .eq('id', projectId)
+    .maybeSingle()
+
+  if (projectError) {
+    res.status(500).json({ error: projectError.message })
+    return
+  }
+  if (!project) {
+    res.status(404).json({ error: 'Project not found' })
+    return
+  }
+
   const { data: membership, error: membershipError } = await supabase
-    .from('project_members')
+    .from('org_members')
     .select('user_id')
-    .eq('project_id', projectId)
+    .eq('org_id', project.org_id)
     .eq('user_id', userId)
     .maybeSingle()
 

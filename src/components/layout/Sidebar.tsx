@@ -2,6 +2,7 @@ import { Box, Typography, Tooltip, Link as MuiLink, Avatar, alpha, useTheme } fr
 import { Stack } from '../FlexStack'
 import { NavLink, Link as RouterLink } from 'react-router-dom'
 import { navItems } from '../../config/navigation'
+import { useOrg } from '../../lib/OrgContext'
 import { useProject } from '../../lib/ProjectContext'
 import { supabase } from '../../lib/supabaseClient'
 import { formatDateTime } from '../../utils/format'
@@ -10,7 +11,9 @@ export const SIDEBAR_WIDTH = 248
 
 export function Sidebar() {
   const theme = useTheme()
+  const org = useOrg()
   const project = useProject()
+  const basePath = `/${org.slug}/${project.slug}`
 
   return (
     <Box
@@ -27,7 +30,11 @@ export function Sidebar() {
         borderRight: `1px solid ${theme.palette.divider}`,
       }}
     >
-      <Box sx={{ px: 2.5, py: 2.75, borderBottom: `1px solid ${theme.palette.divider}` }}>
+      <Box
+        component={RouterLink}
+        to="/"
+        sx={{ display: 'block', px: 2.5, py: 2.75, borderBottom: `1px solid ${theme.palette.divider}`, textDecoration: 'none' }}
+      >
         <Typography
           variant="subtitle2"
           sx={{ letterSpacing: 0.3, fontWeight: 700, fontSize: '1.05rem', lineHeight: 1.2, color: 'primary.light' }}
@@ -39,36 +46,39 @@ export function Sidebar() {
         </Typography>
       </Box>
 
-      <Stack
-        direction="row"
-        spacing={1.25}
-        sx={{ alignItems: 'center', px: 2.5, py: 1.5, borderBottom: `1px solid ${theme.palette.divider}` }}
+      <Box
+        component={RouterLink}
+        to={`/${org.slug}`}
+        sx={{ display: 'block', textDecoration: 'none', color: 'inherit', borderBottom: `1px solid ${theme.palette.divider}` }}
       >
-        <Avatar
-          src={project.logoUrl ?? undefined}
-          variant="rounded"
-          sx={{ width: 28, height: 28, fontSize: '0.8rem', bgcolor: alpha(theme.palette.primary.main, 0.16), color: 'primary.light' }}
-        >
-          {project.name.charAt(0).toUpperCase()}
-        </Avatar>
-        <Typography
-          variant="caption"
-          noWrap
-          sx={{
-            color: 'primary.light',
-            fontWeight: 700,
-            letterSpacing: 0.6,
-            textTransform: 'uppercase',
-          }}
-        >
+        <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center', px: 2.5, py: 1.5 }}>
+          <Avatar
+            src={org.logoUrl ?? undefined}
+            variant="rounded"
+            sx={{ width: 28, height: 28, fontSize: '0.8rem', bgcolor: alpha(theme.palette.primary.main, 0.16), color: 'primary.light' }}
+          >
+            {org.name.charAt(0).toUpperCase()}
+          </Avatar>
+          <Typography
+            variant="caption"
+            noWrap
+            sx={{ color: 'primary.light', fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}
+          >
+            {org.name}
+          </Typography>
+        </Stack>
+      </Box>
+
+      <Box sx={{ px: 2.5, py: 1, borderBottom: `1px solid ${theme.palette.divider}` }}>
+        <Typography variant="body2" noWrap sx={{ fontWeight: 700 }}>
           {project.name}
         </Typography>
-      </Stack>
+      </Box>
 
       <Stack sx={{ flex: 1, py: 1.5, px: 1.25, gap: 0.25, overflowY: 'auto' }}>
         {navItems.map((item) => {
           const Icon = item.icon
-          const href = item.path === '/' ? `/${project.slug}` : `/${project.slug}${item.path}`
+          const href = item.path === '/' ? basePath : `${basePath}${item.path}`
           const content = (
             <Stack
               component="div"
@@ -117,8 +127,8 @@ export function Sidebar() {
 
       <Box sx={{ px: 2.5, py: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
         <Stack component="div" direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
-          <MuiLink component={RouterLink} to="/" variant="caption" sx={{ color: 'text.secondary' }}>
-            ← All projects
+          <MuiLink component={RouterLink} to={`/${org.slug}`} variant="caption" sx={{ color: 'text.secondary' }}>
+            ← {org.name}
           </MuiLink>
           <MuiLink
             component="button"
