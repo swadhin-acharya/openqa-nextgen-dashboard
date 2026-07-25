@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Link as RouterLink, useParams } from 'react-router-dom'
 import {
   Box,
-  Container,
+  Stack,
   Typography,
   Paper,
   Button,
@@ -12,9 +11,10 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material'
-import { Stack } from '../components/FlexStack'
+import { PageHeader } from '../components/layout/PageHeader'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../lib/AuthContext'
+import { useProject } from '../lib/ProjectContext'
 
 interface TokenRow {
   id: string
@@ -26,41 +26,28 @@ interface TokenRow {
 }
 
 export default function TokensPage() {
-  const { slug } = useParams<{ slug: string }>()
+  const project = useProject()
   const { session } = useAuth()
-  const [projectId, setProjectId] = useState<string | null>(null)
   const [tokens, setTokens] = useState<TokenRow[] | null>(null)
   const [freshToken, setFreshToken] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [generating, setGenerating] = useState(false)
 
-  async function refresh(pid: string) {
+  async function refresh() {
     const { data } = await supabase
       .from('personal_access_tokens')
       .select('id, name, token_prefix, created_at, last_used_at, revoked_at')
-      .eq('project_id', pid)
+      .eq('project_id', project.projectId)
       .order('created_at', { ascending: false })
     setTokens(data ?? [])
   }
 
   useEffect(() => {
-    supabase
-      .from('projects')
-      .select('id')
-      .eq('slug', slug)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data) {
-          setProjectId(data.id)
-          refresh(data.id)
-        } else {
-          setTokens([])
-        }
-      })
-  }, [slug])
+    refresh()
+  }, [project.projectId])
 
   async function handleGenerate() {
-    if (!projectId || !session) return
+    if (!session) return
     setGenerating(true)
     setError(null)
     setFreshToken(null)
@@ -71,7 +58,7 @@ export default function TokensPage() {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${session.access_token}`,
       },
-      body: JSON.stringify({ projectId, name: 'default' }),
+      body: JSON.stringify({ projectId: project.projectId, name: 'default' }),
     })
     const body = await res.json()
     setGenerating(false)
@@ -82,19 +69,12 @@ export default function TokensPage() {
     }
 
     setFreshToken(body.token)
-    refresh(projectId)
+    refresh()
   }
 
   return (
-    <Container maxWidth="sm" sx={{ py: 6 }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700 }}>
-          Access tokens
-        </Typography>
-        <Button component={RouterLink} to={`/${slug}`} variant="text" size="small">
-          Back to dashboard
-        </Button>
-      </Stack>
+    <Stack>
+      <PageHeader title="Access tokens" subtitle={`Personal access tokens for ${project.name}`} />
 
       {freshToken && (
         <Alert severity="success" sx={{ mb: 3, wordBreak: 'break-all' }}>
@@ -110,7 +90,7 @@ export default function TokensPage() {
         </Alert>
       )}
 
-      <Button variant="contained" onClick={handleGenerate} disabled={!projectId || generating} sx={{ mb: 3 }}>
+      <Button variant="contained" onClick={handleGenerate} disabled={generating} sx={{ mb: 3, alignSelf: 'flex-start' }}>
         {generating ? 'Generating…' : 'Generate token'}
       </Button>
 
@@ -142,6 +122,6 @@ export default function TokensPage() {
           </List>
         </Paper>
       )}
-    </Container>
+    </Stack>
   )
 }

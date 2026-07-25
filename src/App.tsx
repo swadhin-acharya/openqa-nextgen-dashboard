@@ -4,7 +4,8 @@ import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import HomePage from './pages/HomePage'
 import NewProjectPage from './pages/NewProjectPage'
-import ProjectDashboardPage from './pages/ProjectDashboardPage'
+import ProjectShell from './pages/ProjectShell'
+import ProjectOverviewPage from './pages/ProjectOverviewPage'
 import TokensPage from './pages/TokensPage'
 
 export default function App() {
@@ -32,18 +33,13 @@ export default function App() {
         path="/:slug"
         element={
           <RequireAuth>
-            <ProjectDashboardPage />
+            <ProjectShell />
           </RequireAuth>
         }
-      />
-      <Route
-        path="/:slug/tokens"
-        element={
-          <RequireAuth>
-            <TokensPage />
-          </RequireAuth>
-        }
-      />
+      >
+        <Route index element={<ProjectOverviewPage />} />
+        <Route path="tokens" element={<TokensPage />} />
+      </Route>
     </Routes>
   )
 }
