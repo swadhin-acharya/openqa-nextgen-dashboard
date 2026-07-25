@@ -36,6 +36,26 @@ export function formatDateShort(iso: string): string {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
+/** Local (browser-timezone) calendar date as YYYY-MM-DD - matches the value
+ * shape of a native <input type="date">, so a date-range filter's bounds
+ * compare correctly against what formatDate()/formatDateShort() display
+ * (both also local time), rather than the raw UTC date. */
+export function localDateKey(iso: string): string {
+  const d = new Date(iso)
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+export function isWithinDateRange(iso: string, range: { from: string; to: string }): boolean {
+  if (!range.from && !range.to) return true
+  const key = localDateKey(iso)
+  if (range.from && key < range.from) return false
+  if (range.to && key > range.to) return false
+  return true
+}
+
 export function formatDateTime(iso: string): string {
   const date = new Date(iso)
   return date.toLocaleString('en-US', {
