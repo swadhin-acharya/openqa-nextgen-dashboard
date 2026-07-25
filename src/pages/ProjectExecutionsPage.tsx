@@ -157,7 +157,12 @@ export default function ProjectExecutionsPage() {
                       <TableCell sx={{ color: 'text.secondary' }}>{formatDuration(row.duration ?? 0)}</TableCell>
                       <TableCell sx={{ color: 'text.secondary' }}>{row.date ? formatDateTime(row.date) : '—'}</TableCell>
                       <TableCell>
-                        {!row.mergedIntoMainDashboard && (
+                        {row.isLive && (
+                          <Tooltip title="Still running - counts will keep updating until it finishes">
+                            <Chip label="live" size="small" color="primary" variant="outlined" sx={{ fontSize: '0.65rem' }} />
+                          </Tooltip>
+                        )}
+                        {!row.isLive && !row.mergedIntoMainDashboard && (
                           <Tooltip title={`Excluded from the main dashboard (branch "${row.branch}" isn't this project's main branch)`}>
                             <Chip label="not main" size="small" sx={{ fontSize: '0.65rem' }} />
                           </Tooltip>

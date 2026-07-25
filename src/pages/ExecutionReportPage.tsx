@@ -12,6 +12,7 @@ import {
   Chip,
   Button,
   CircularProgress,
+  LinearProgress,
   Box,
 } from '@mui/material'
 import { Stack } from '../components/FlexStack'
@@ -38,6 +39,7 @@ export default function ExecutionReportPage() {
   const { executionId } = useParams<{ executionId: string }>()
   const { data, loading, error } = useExecutionDetail(project.projectId, executionId ?? '')
   const meta = data?.meta
+  const live = data?.live
 
   return (
     <Stack>
@@ -46,7 +48,9 @@ export default function ExecutionReportPage() {
         subtitle={
           meta
             ? `${data?.suiteName ?? 'Default'} · ${meta.branch ?? 'no branch'} · ${meta.date ? formatDateTime(meta.date) : 'unknown date'}`
-            : undefined
+            : live
+              ? `${live.branch ?? 'no branch'} · started ${formatDateTime(live.startedAt)}`
+              : undefined
         }
         actions={
           <Button component={RouterLink} to=".." variant="text" size="small">
@@ -60,7 +64,45 @@ export default function ExecutionReportPage() {
           <CircularProgress size={28} />
         </Box>
       )}
-      {!loading && (error || !meta) && <Typography color="text.secondary">This execution wasn't found.</Typography>}
+      {!loading && error && !live && <Typography color="text.secondary">This execution wasn't found.</Typography>}
+      {!loading && !error && !meta && !live && (
+        <Typography color="text.secondary">This execution wasn't found.</Typography>
+      )}
+
+      {!loading && !meta && live && (
+        <Stack spacing={2.5}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+            <StatusChip status="running" />
+            {live.executedByName && <Chip label={live.executedByName} size="small" variant="outlined" />}
+          </Stack>
+
+          <LinearProgress
+            variant="determinate"
+            value={live.total > 0 ? Math.min(100, ((live.passed + live.failed + live.broken + live.skipped) / live.total) * 100) : 0}
+            sx={{ height: 6, borderRadius: 3 }}
+          />
+
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 6, sm: 3 }}>
+              <Stat label="Total" value={formatNumber(live.total)} />
+            </Grid>
+            <Grid size={{ xs: 6, sm: 3 }}>
+              <Stat label="Completed so far" value={formatNumber(live.passed + live.failed + live.broken + live.skipped)} />
+            </Grid>
+            <Grid size={{ xs: 6, sm: 3 }}>
+              <Stat label="Passed" value={formatNumber(live.passed)} />
+            </Grid>
+            <Grid size={{ xs: 6, sm: 3 }}>
+              <Stat label="Failed / Broken" value={`${live.failed} / ${live.broken}`} />
+            </Grid>
+          </Grid>
+
+          <Typography variant="body2" color="text.secondary">
+            This execution is still running - this page updates automatically as new results come in. It'll turn
+            into the full report once the run finishes.
+          </Typography>
+        </Stack>
+      )}
 
       {!loading && meta && (
         <Stack spacing={2.5}>

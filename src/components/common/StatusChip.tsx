@@ -9,11 +9,21 @@ const labels: Record<string, string> = {
   skipped: 'Skipped',
   unknown: 'Unknown',
   mixed: 'Mixed',
+  running: 'Running',
 }
 
-export function StatusChip({ status, size = 'small' }: { status: TestStatus | 'mixed'; size?: 'small' | 'medium' }) {
+export function StatusChip({
+  status,
+  size = 'small',
+}: {
+  status: TestStatus | 'mixed' | 'running'
+  size?: 'small' | 'medium'
+}) {
   const theme = useTheme()
-  const color = statusColors[status as keyof typeof statusColors] ?? theme.palette.text.secondary
+  // "running" isn't a real Allure test status (Phase 10 live executions) -
+  // give it the theme's primary color rather than pretending it maps to
+  // one of the pass/fail/broken/skipped palette.
+  const color = status === 'running' ? theme.palette.primary.main : statusColors[status as keyof typeof statusColors] ?? theme.palette.text.secondary
 
   return (
     <Chip
