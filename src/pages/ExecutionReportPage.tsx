@@ -72,6 +72,14 @@ export default function ExecutionReportPage() {
             {!meta.mergedIntoMainDashboard && (
               <Chip label="Not in main dashboard" size="small" sx={{ fontSize: '0.7rem' }} />
             )}
+            {(meta.attempts ?? 1) > 1 && (
+              <Chip
+                label={`Retried · ${meta.attempts} attempts`}
+                size="small"
+                variant="outlined"
+                sx={{ fontSize: '0.7rem' }}
+              />
+            )}
           </Stack>
 
           <Grid container spacing={2}>

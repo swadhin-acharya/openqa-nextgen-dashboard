@@ -1,6 +1,7 @@
 import type { HistoryState, FailureHistoryState } from '../../processor/history.js'
 import type { DashboardData } from '../../processor/dashboard-data.js'
 import type { TestSummary, RecentExecutionRow } from '../../processor/models.js'
+import type { AllureResult } from '../../processor/reader.js'
 import { getServiceRoleClient } from './db.js'
 
 /**
@@ -18,10 +19,18 @@ export interface ExecutionMeta extends Omit<RecentExecutionRow, 'executionId'> {
   executedByName: string | null
   executedByEmail: string | null
   mergedIntoMainDashboard: boolean
+  /** How many times this executionId has been (re-)ingested. >1 means later
+   * attempts were merged in as retries - see retryMerge.ts. */
+  attempts: number
 }
 
 export type ExecutionsMeta = Record<string, ExecutionMeta>
 export type ExecutionTestsMap = Record<string, TestSummary[]>
+/** Full-fidelity Allure results per executionId (unlike execution_tests'
+ * reduced TestSummary shape) - kept so a later retry ingest for the same
+ * executionId can be merged with the vendored functions unchanged. Trimmed
+ * to the same executionIds as execution_tests, not kept forever. */
+export type ExecutionRawResultsMap = Record<string, AllureResult[]>
 
 /**
  * Postgres-backed replacement for processor/history.ts's loadHistory(dataDir)
@@ -93,6 +102,18 @@ export async function loadExecutionTestsFromDb(projectId: string): Promise<Execu
   return (data?.execution_tests as ExecutionTestsMap | undefined) ?? {}
 }
 
+export async function loadExecutionRawResultsFromDb(projectId: string): Promise<ExecutionRawResultsMap> {
+  const supabase = getServiceRoleClient()
+  const { data, error } = await supabase
+    .from('dashboard_data')
+    .select('execution_raw_results')
+    .eq('project_id', projectId)
+    .maybeSingle()
+
+  if (error) throw new Error(`loadExecutionRawResultsFromDb: ${error.message}`)
+  return (data?.execution_raw_results as ExecutionRawResultsMap | undefined) ?? {}
+}
+
 /**
  * Full write for a main-branch ingest - the vendored aggregate (summary/
  * executions/trends/features/tests/failures/categories/environment) plus
@@ -105,6 +126,7 @@ export async function writeDashboardDataToDb(
   executionsMeta: ExecutionsMeta,
   executionTests: ExecutionTestsMap,
   rawEnvironment: Record<string, string>,
+  executionRawResults: ExecutionRawResultsMap,
 ): Promise<void> {
   const supabase = getServiceRoleClient()
   const { error } = await supabase.from('dashboard_data').upsert({
@@ -121,6 +143,7 @@ export async function writeDashboardDataToDb(
     failure_contributions: contributions,
     executions_meta: executionsMeta,
     execution_tests: executionTests,
+    execution_raw_results: executionRawResults,
     updated_at: new Date().toISOString(),
   })
 
@@ -138,12 +161,14 @@ export async function writeExecutionsMetaAndTests(
   projectId: string,
   executionsMeta: ExecutionsMeta,
   executionTests: ExecutionTestsMap,
+  executionRawResults: ExecutionRawResultsMap,
 ): Promise<void> {
   const supabase = getServiceRoleClient()
   const { error } = await supabase.from('dashboard_data').upsert({
     project_id: projectId,
     executions_meta: executionsMeta,
     execution_tests: executionTests,
+    execution_raw_results: executionRawResults,
     updated_at: new Date().toISOString(),
   })
 

@@ -1,4 +1,5 @@
 import { readAllureResults } from '../../processor/reader.js'
+import type { RawAllureData } from '../../processor/reader.js'
 import {
   buildExecutionSummary,
   buildFeatureSummaries,
@@ -6,6 +7,7 @@ import {
   buildCategorySummaries,
 } from '../../processor/normalize.js'
 import { mergeExecutionHistory, computeComparison, mergeFailureHistory } from '../../processor/history.js'
+import type { FailureHistoryState } from '../../processor/history.js'
 import type { DashboardData } from '../../processor/dashboard-data.js'
 import type { ExecutionSummary } from '../../processor/models.js'
 import {
@@ -13,12 +15,14 @@ import {
   loadFailureHistoryStateFromDb,
   loadExecutionsMetaFromDb,
   loadExecutionTestsFromDb,
+  loadExecutionRawResultsFromDb,
   writeDashboardDataToDb,
   writeExecutionsMetaAndTests,
   type ExecutionMeta,
 } from './history-db.js'
 import { resolveSuiteId } from './suites.js'
 import { appendExecutionLog } from './executionLog.js'
+import { mergeRawResults } from './retryMerge.js'
 import { getServiceRoleClient } from './db.js'
 
 export interface ProcessExecutionForProjectOptions {
@@ -33,13 +37,18 @@ export interface ProcessExecutionForProjectOptions {
 }
 
 export interface ProcessExecutionForProjectResult {
-  /** This run's own stats - always present, regardless of branch. */
+  /** This run's own stats - always present, regardless of branch. After a
+   * retry, this reflects the MERGED final state, not just this attempt. */
   execution: ExecutionSummary
   suiteId: string
   branch: string | null
   /** False when this execution's branch != the project's main_branch, so it
    * was recorded but excluded from the shared aggregate (see below). */
   mergedIntoMainDashboard: boolean
+  /** True if executionId matched an already-recorded execution, so this
+   * ingest's results were merged in as a retry rather than starting fresh. */
+  isRetry: boolean
+  attempts: number
 }
 
 const DEFAULT_HISTORY_LIMIT = 50
@@ -55,6 +64,37 @@ function trimToRecent<T extends { date: string }>(map: Record<string, T>, limit:
       .sort((a, b) => new Date(b[1].date).getTime() - new Date(a[1].date).getTime())
       .slice(0, limit),
   )
+}
+
+/**
+ * Undoes whatever this executionId previously contributed to failure
+ * history, before re-merging its (now-retried) results. Without this, a
+ * test that flips from failed to passed via a retry would keep counting as
+ * a failure occurrence from this same executionId forever - mergeFailureHistory
+ * (processor/history.ts, unchanged/vendored) only ever adds occurrences, it
+ * has no notion of a test "un-failing" on a later attempt of the same run.
+ * Only ever called for executionIds that are actually being retried.
+ */
+function retractExecutionFromFailureHistory(state: FailureHistoryState, executionId: string): FailureHistoryState {
+  const byTestId = new Map(state.failures.map((f) => [f.testId, { ...f }]))
+  const contributions: Record<string, string[]> = {}
+
+  for (const [testId, ids] of Object.entries(state.contributions)) {
+    if (!ids.includes(executionId)) {
+      contributions[testId] = ids
+      continue
+    }
+    const remaining = ids.filter((id) => id !== executionId)
+    if (remaining.length > 0) contributions[testId] = remaining
+
+    const existing = byTestId.get(testId)
+    if (existing) {
+      existing.occurrences = Math.max(0, existing.occurrences - (ids.length - remaining.length))
+      if (existing.occurrences <= 0) byTestId.delete(testId)
+    }
+  }
+
+  return { failures: [...byTestId.values()], contributions }
 }
 
 /**
@@ -78,13 +118,30 @@ export async function processExecutionForProject(
 
   const raw = readAllureResults(options.allureResultsDir)
   const executionId = options.executionId ?? String(raw.executor?.buildOrder ?? Date.now())
-  const execution = buildExecutionSummary(raw, {
+
+  // A rerun of the same suite (same executionId as something already
+  // recorded) merges test-by-test with the previous attempt - latest
+  // attempt wins per test, anything not rerun is carried over unchanged -
+  // rather than replacing the whole execution with just whatever subset of
+  // tests this particular attempt happened to include. See retryMerge.ts.
+  // The merge happens on raw Allure results (not the reduced TestSummary
+  // shape) so the vendored build*Summaries functions below run completely
+  // unchanged on the merged data - no vendored file needs to know this
+  // feature exists.
+  const existingRawResults = await loadExecutionRawResultsFromDb(options.projectId)
+  const previousAttempt = existingRawResults[executionId]
+  const isRetry = previousAttempt !== undefined
+  const effectiveRaw: RawAllureData = isRetry
+    ? { ...raw, results: mergeRawResults(previousAttempt, raw.results) }
+    : raw
+
+  const execution = buildExecutionSummary(effectiveRaw, {
     executionId,
     executionName: options.executionName,
   })
-  const features = buildFeatureSummaries(raw)
-  const tests = buildTestSummaries(raw)
-  const categories = buildCategorySummaries(raw)
+  const features = buildFeatureSummaries(effectiveRaw)
+  const tests = buildTestSummaries(effectiveRaw)
+  const categories = buildCategorySummaries(effectiveRaw)
 
   // Both already fully parsed by readAllureResults/parsePropertiesFile into
   // raw.environment - buildEnvironmentInfo keeps Branch but drops Suite
@@ -103,12 +160,17 @@ export async function processExecutionForProject(
   const mainBranch = project?.main_branch ?? 'main'
   const mergedIntoMainDashboard = !branch || branch === mainBranch
 
+  const existingMeta = await loadExecutionsMetaFromDb(options.projectId)
+  const existingTests = await loadExecutionTestsFromDb(options.projectId)
+  const attemptCount = (existingMeta[executionId]?.attempts ?? 0) + 1
+
   const meta: ExecutionMeta = {
     suiteId,
     branch,
     executedByName: options.executedByName ?? null,
     executedByEmail: options.executedByEmail ?? null,
     mergedIntoMainDashboard,
+    attempts: attemptCount,
     status: execution.status,
     total: execution.total,
     passed: execution.passed,
@@ -121,11 +183,12 @@ export async function processExecutionForProject(
     date: execution.startTime,
   }
 
-  const existingMeta = await loadExecutionsMetaFromDb(options.projectId)
-  const existingTests = await loadExecutionTestsFromDb(options.projectId)
   const updatedMeta = trimToRecent({ ...existingMeta, [executionId]: meta }, META_RETENTION_LIMIT)
   const updatedTests = Object.fromEntries(
     Object.entries({ ...existingTests, [executionId]: tests }).filter(([id]) => id in updatedMeta),
+  )
+  const updatedRawResults = Object.fromEntries(
+    Object.entries({ ...existingRawResults, [executionId]: effectiveRaw.results }).filter(([id]) => id in updatedMeta),
   )
 
   if (mergedIntoMainDashboard) {
@@ -133,7 +196,8 @@ export async function processExecutionForProject(
     const mergedHistory = mergeExecutionHistory(history, execution, historyLimit)
     const comparison = computeComparison(mergedHistory.executions)
 
-    const failureState = await loadFailureHistoryStateFromDb(options.projectId)
+    let failureState = await loadFailureHistoryStateFromDb(options.projectId)
+    if (isRetry) failureState = retractExecutionFromFailureHistory(failureState, executionId)
     const mergedFailureState = mergeFailureHistory(
       failureState,
       tests,
@@ -164,16 +228,17 @@ export async function processExecutionForProject(
       updatedMeta,
       updatedTests,
       raw.environment,
+      updatedRawResults,
     )
   } else {
     // Non-main branch: record it (meta/tests above) but leave the vendored
     // aggregate - what Overview reads - completely untouched.
-    await writeExecutionsMetaAndTests(options.projectId, updatedMeta, updatedTests)
+    await writeExecutionsMetaAndTests(options.projectId, updatedMeta, updatedTests, updatedRawResults)
   }
 
   // Unbounded ledger for the History page - every execution, regardless of
   // branch or the capped retention above (see supabase/migrations/0008_execution_log.sql).
   await appendExecutionLog(options.projectId, executionId, meta)
 
-  return { execution, suiteId, branch, mergedIntoMainDashboard }
+  return { execution, suiteId, branch, mergedIntoMainDashboard, isRetry, attempts: attemptCount }
 }

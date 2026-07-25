@@ -1,0 +1,15 @@
+-- Retry-merge support: when an ingest reuses an executionId that's already
+-- been recorded (a rerun of the same suite - e.g. one member's run had
+-- failures, a teammate reruns and some now pass), the final state in the
+-- dashboard should reflect the merged, latest-attempt-wins outcome per test,
+-- not just whatever subset of tests happened to be in the most recent
+-- attempt (a partial rerun of only the previously-failed tests would
+-- otherwise blow away the rest of the suite's results for that execution).
+--
+-- This requires the full Allure result objects (historyId, status,
+-- statusDetails, labels - not just the reduced TestSummary shape already
+-- kept in execution_tests) so a retry can be merged with the vendored
+-- processor's own functions unchanged (see api/_lib/retryMerge.ts and
+-- processExecutionForProject.ts) - only the merge itself is new code, no
+-- vendored file is touched.
+alter table public.dashboard_data add column if not exists execution_raw_results jsonb not null default '{}'::jsonb;

@@ -157,6 +157,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       passRate: current.passRate,
       branch: result.branch,
       mergedIntoMainDashboard: result.mergedIntoMainDashboard,
+      isRetry: result.isRetry,
+      attempts: result.attempts,
     })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
