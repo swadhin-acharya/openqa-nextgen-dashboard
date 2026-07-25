@@ -20,6 +20,8 @@ import ProjectTrendsPage from './pages/ProjectTrendsPage'
 import ProjectTimelinePage from './pages/ProjectTimelinePage'
 import ProjectHistoryPage from './pages/ProjectHistoryPage'
 import OrgMembersPage from './pages/OrgMembersPage'
+import OrgSettingsPage from './pages/OrgSettingsPage'
+import ProjectSettingsPage from './pages/ProjectSettingsPage'
 import TokensPage from './pages/TokensPage'
 
 export default function App() {
@@ -53,9 +55,11 @@ export default function App() {
       >
         <Route index element={<OrgHomePage />} />
         <Route path="members" element={<OrgMembersPage />} />
+        <Route path="settings" element={<OrgSettingsPage />} />
         <Route path="projects/new" element={<NewProjectPage />} />
         <Route path=":projectSlug" element={<ProjectShell />}>
           <Route index element={<ProjectOverviewPage />} />
+          <Route path="settings" element={<ProjectSettingsPage />} />
           <Route path="executions" element={<ProjectExecutionsPage />} />
           <Route path="executions/:executionId" element={<ExecutionReportPage />} />
           <Route path="features" element={<ProjectFeaturesPage />} />

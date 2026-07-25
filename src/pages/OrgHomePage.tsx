@@ -148,9 +148,14 @@ export default function OrgHomePage() {
           {org.name}
         </Typography>
         {org.role === 'owner' && (
-          <Button component={RouterLink} to="members" variant="outlined" size="small">
-            Members
-          </Button>
+          <Stack direction="row" spacing={1}>
+            <Button component={RouterLink} to="members" variant="outlined" size="small">
+              Members
+            </Button>
+            <Button component={RouterLink} to="settings" variant="outlined" size="small">
+              Settings
+            </Button>
+          </Stack>
         )}
       </Stack>
 

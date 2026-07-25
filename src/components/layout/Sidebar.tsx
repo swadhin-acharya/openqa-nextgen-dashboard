@@ -1,4 +1,5 @@
-import { Box, Typography, Tooltip, Link as MuiLink, Avatar, alpha, useTheme } from '@mui/material'
+import { Box, Typography, Tooltip, Link as MuiLink, Avatar, IconButton, alpha, useTheme } from '@mui/material'
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import { Stack } from '../FlexStack'
 import { NavLink, Link as RouterLink } from 'react-router-dom'
 import { navItems } from '../../config/navigation'
@@ -72,11 +73,22 @@ export function Sidebar() {
         </Stack>
       </Box>
 
-      <Box sx={{ px: 2.5, py: 1, borderBottom: `1px solid ${theme.palette.divider}` }}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        sx={{ alignItems: 'center', px: 2.5, py: 1, borderBottom: `1px solid ${theme.palette.divider}` }}
+      >
         <Typography variant="body2" noWrap sx={{ fontWeight: 700 }}>
           {project.name}
         </Typography>
-      </Box>
+        {org.role === 'owner' && (
+          <Tooltip title="Project settings">
+            <IconButton component={RouterLink} to="settings" size="small" sx={{ ml: 1 }}>
+              <SettingsOutlinedIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Stack>
 
       <Stack sx={{ flex: 1, py: 1.5, px: 1.25, gap: 0.25, overflowY: 'auto' }}>
         {navItems.map((item) => {
