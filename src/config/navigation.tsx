@@ -23,9 +23,9 @@ export const navItems: NavItem[] = [
   { label: 'Executions', path: '/executions', icon: PlayCircleOutlineRoundedIcon, enabled: true },
   { label: 'Features', path: '/features', icon: CategoryRoundedIcon, enabled: true },
   { label: 'Tests', path: '/tests', icon: FactCheckRoundedIcon, enabled: true },
-  { label: 'Failure Analysis', path: '/failure-analysis', icon: ReportProblemRoundedIcon, enabled: false },
+  { label: 'Failure Analysis', path: '/failure-analysis', icon: ReportProblemRoundedIcon, enabled: true },
   { label: 'Timeline', path: '/timeline', icon: TimelineRoundedIcon, enabled: false },
-  { label: 'Retries', path: '/retries', icon: ReplayRoundedIcon, enabled: false },
+  { label: 'Retries', path: '/retries', icon: ReplayRoundedIcon, enabled: true },
   { label: 'Trends', path: '/trends', icon: TrendingUpRoundedIcon, enabled: false },
   { label: 'History', path: '/history', icon: HistoryRoundedIcon, enabled: false },
   // Aliases the Executions list - this product's mental model has no
