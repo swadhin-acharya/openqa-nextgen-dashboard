@@ -26,12 +26,17 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           display: { xs: 'none', md: 'flex' },
           flexDirection: 'column',
           justifyContent: 'center',
+          // A flex column's default alignItems is "stretch" - without this,
+          // the logo (a fixed-height img with no explicit width) gets
+          // stretched to the full panel width, squashing its 2:1 aspect
+          // ratio into an illegible smear. flex-start lets it size naturally.
+          alignItems: 'flex-start',
           px: 8,
           background: `linear-gradient(160deg, ${alpha(theme.palette.primary.main, 0.16)}, ${theme.palette.background.default})`,
           borderRight: `1px solid ${theme.palette.divider}`,
         }}
       >
-        <Box component="img" src={openQaLogo} alt="OpenQA" sx={{ height: 56, display: 'block', mb: 1 }} />
+        <Box component="img" src={openQaLogo} alt="OpenQA" sx={{ height: 48, width: 'auto', display: 'block', mb: 2 }} />
         <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>
           NextGen Dashboard
         </Typography>

@@ -5,6 +5,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import { Stack } from '../components/FlexStack'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../lib/AuthContext'
+import openQaLogo from '../assets/logoOpenQA.png'
 
 interface OrgRow {
   id: string
@@ -141,6 +142,8 @@ export default function HomePage() {
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }}>
+      <Box component="img" src={openQaLogo} alt="OpenQA" sx={{ height: 32, width: 'auto', display: 'block', mb: 3 }} />
+
       <Stack direction="row" justifyContent="space-between" sx={{ alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" sx={{ fontWeight: 700 }}>
           Your organizations
