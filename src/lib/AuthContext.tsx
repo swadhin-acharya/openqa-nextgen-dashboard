@@ -8,14 +8,17 @@ interface AuthContextValue {
   loading: boolean
   /** profiles.is_admin for the current session - null while still resolving. */
   isAdmin: boolean | null
+  /** profiles.name - null while still resolving. */
+  name: string | null
 }
 
-const AuthContext = createContext<AuthContextValue>({ session: null, loading: true, isAdmin: null })
+const AuthContext = createContext<AuthContextValue>({ session: null, loading: true, isAdmin: null, name: null })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
+  const [name, setName] = useState<string | null>(null)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -33,17 +36,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!session) {
       setIsAdmin(null)
+      setName(null)
       return
     }
     supabase
       .from('profiles')
-      .select('is_admin')
+      .select('is_admin, name')
       .eq('id', session.user.id)
       .maybeSingle()
-      .then(({ data }) => setIsAdmin(data?.is_admin ?? false))
+      .then(({ data }) => {
+        setIsAdmin(data?.is_admin ?? false)
+        setName(data?.name ?? null)
+      })
   }, [session])
 
-  return <AuthContext.Provider value={{ session, loading, isAdmin }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ session, loading, isAdmin, name }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {

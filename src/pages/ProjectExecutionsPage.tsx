@@ -47,15 +47,17 @@ export default function ProjectExecutionsPage() {
   const [creatingSuite, setCreatingSuite] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
 
+  const executorName = (r: (typeof rows)[number]) => r.executedByName ?? r.executedByEmail
+
   const executors = useMemo(
-    () => [...new Set(rows.map((r) => r.executedByEmail).filter((e): e is string => !!e))].sort(),
+    () => [...new Set(rows.map(executorName).filter((e): e is string => !!e))].sort(),
     [rows],
   )
   const branches = useMemo(() => [...new Set(rows.map((r) => r.branch).filter((b): b is string => !!b))].sort(), [rows])
 
   const filteredRows = rows.filter((r) => {
     if (suiteFilter !== ALL && r.suiteName !== suiteFilter) return false
-    if (executorFilter !== ALL && r.executedByEmail !== executorFilter) return false
+    if (executorFilter !== ALL && executorName(r) !== executorFilter) return false
     if (branchFilter !== ALL && r.branch !== branchFilter) return false
     return true
   })
@@ -149,7 +151,7 @@ export default function ProjectExecutionsPage() {
                       </TableCell>
                       <TableCell>{row.suiteName}</TableCell>
                       <TableCell>{row.branch ?? '—'}</TableCell>
-                      <TableCell>{row.executedByEmail ?? '—'}</TableCell>
+                      <TableCell>{executorName(row) ?? '—'}</TableCell>
                       <TableCell>{formatNumber(row.total ?? 0)}</TableCell>
                       <TableCell>{formatPercent(row.passRate ?? 0)}</TableCell>
                       <TableCell sx={{ color: 'text.secondary' }}>{formatDuration(row.duration ?? 0)}</TableCell>

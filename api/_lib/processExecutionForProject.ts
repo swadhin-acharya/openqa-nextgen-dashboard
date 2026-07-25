@@ -27,6 +27,7 @@ export interface ProcessExecutionForProjectOptions {
   allureResultsDir: string
   executionId?: string
   executionName?: string
+  executedByName?: string | null
   executedByEmail?: string | null
   historyLimit?: number
 }
@@ -105,6 +106,7 @@ export async function processExecutionForProject(
   const meta: ExecutionMeta = {
     suiteId,
     branch,
+    executedByName: options.executedByName ?? null,
     executedByEmail: options.executedByEmail ?? null,
     mergedIntoMainDashboard,
     status: execution.status,

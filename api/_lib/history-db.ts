@@ -13,6 +13,9 @@ import { getServiceRoleClient } from './db.js'
 export interface ExecutionMeta extends Omit<RecentExecutionRow, 'executionId'> {
   suiteId: string | null
   branch: string | null
+  /** Display identity for "executor" - name is what's shown in the UI,
+   * email is kept alongside for uniqueness/filtering. */
+  executedByName: string | null
   executedByEmail: string | null
   mergedIntoMainDashboard: boolean
 }

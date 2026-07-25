@@ -51,9 +51,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Attribute this execution to whichever member's PAT pushed it ("executor"
   // in the Executions page's filters, distinct from Allure's own CI executor
-  // concept). Best-effort - a lookup failure shouldn't fail the ingest.
-  const { data: executorUser } = await supabase.auth.admin.getUserById(patRow.user_id)
-  const executedByEmail = executorUser?.user?.email ?? null
+  // concept). Executor is identified by name (profiles.name), with email
+  // kept alongside for uniqueness/filtering. Best-effort - a lookup failure
+  // shouldn't fail the ingest.
+  const { data: executorProfile } = await supabase
+    .from('profiles')
+    .select('name, email')
+    .eq('id', patRow.user_id)
+    .maybeSingle()
+  const executedByName = executorProfile?.name ?? null
+  const executedByEmail = executorProfile?.email ?? null
 
   let tmpDir: string | null = null
   try {
@@ -88,6 +95,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const result = await processExecutionForProject({
       projectId: patRow.project_id,
       allureResultsDir,
+      executedByName,
       executedByEmail,
     })
 

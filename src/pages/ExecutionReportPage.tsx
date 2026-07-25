@@ -66,7 +66,9 @@ export default function ExecutionReportPage() {
         <Stack spacing={2.5}>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <StatusChip status={meta.status} />
-            {meta.executedByEmail && <Chip label={meta.executedByEmail} size="small" variant="outlined" />}
+            {(meta.executedByName ?? meta.executedByEmail) && (
+              <Chip label={meta.executedByName ?? meta.executedByEmail} size="small" variant="outlined" />
+            )}
             {!meta.mergedIntoMainDashboard && (
               <Chip label="Not in main dashboard" size="small" sx={{ fontSize: '0.7rem' }} />
             )}

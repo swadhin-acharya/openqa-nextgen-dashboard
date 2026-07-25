@@ -71,7 +71,7 @@ export default function ProjectTimelinePage() {
                   )}
                 </Stack>
                 <Typography variant="caption" color="text.secondary">
-                  {formatDateTime(row.date)} · {row.suiteName} · {row.branch ?? 'no branch'} · {row.executedByEmail ?? 'unknown'} ·{' '}
+                  {formatDateTime(row.date)} · {row.suiteName} · {row.branch ?? 'no branch'} · {row.executedByName ?? row.executedByEmail ?? 'unknown'} ·{' '}
                   {formatDuration(row.duration)}
                 </Typography>
               </Box>

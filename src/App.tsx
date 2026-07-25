@@ -19,6 +19,7 @@ import ProjectRetriesPage from './pages/ProjectRetriesPage'
 import ProjectTrendsPage from './pages/ProjectTrendsPage'
 import ProjectTimelinePage from './pages/ProjectTimelinePage'
 import ProjectHistoryPage from './pages/ProjectHistoryPage'
+import OrgMembersPage from './pages/OrgMembersPage'
 import TokensPage from './pages/TokensPage'
 
 export default function App() {
@@ -51,6 +52,7 @@ export default function App() {
         }
       >
         <Route index element={<OrgHomePage />} />
+        <Route path="members" element={<OrgMembersPage />} />
         <Route path="projects/new" element={<NewProjectPage />} />
         <Route path=":projectSlug" element={<ProjectShell />}>
           <Route index element={<ProjectOverviewPage />} />

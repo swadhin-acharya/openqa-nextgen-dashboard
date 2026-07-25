@@ -7,6 +7,7 @@ import { useAuth } from '../lib/AuthContext'
 
 export default function SignupPage() {
   const { session } = useAuth()
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -20,7 +21,10 @@ export default function SignupPage() {
     setSubmitting(true)
     setError(null)
     setInfo(null)
-    const { data, error } = await supabase.auth.signUp({ email, password })
+    // options.data lands in auth.users.raw_user_meta_data, which
+    // handle_new_user() (see supabase/migrations/0009_rbac_and_profile_name.sql)
+    // reads to populate profiles.name.
+    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name: name.trim() } } })
     setSubmitting(false)
     if (error) {
       setError(error.message)
@@ -47,6 +51,7 @@ export default function SignupPage() {
         <Stack spacing={2}>
           {error && <Alert severity="error">{error}</Alert>}
           {info && <Alert severity="info">{info}</Alert>}
+          <TextField label="Full name" value={name} onChange={(e) => setName(e.target.value)} required fullWidth />
           <TextField
             label="Email"
             type="email"

@@ -143,9 +143,16 @@ export default function OrgHomePage() {
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }}>
-      <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>
-        {org.name}
-      </Typography>
+      <Stack direction="row" justifyContent="space-between" sx={{ alignItems: 'center', mb: 3 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700 }}>
+          {org.name}
+        </Typography>
+        {org.role === 'owner' && (
+          <Button component={RouterLink} to="members" variant="outlined" size="small">
+            Members
+          </Button>
+        )}
+      </Stack>
 
       {projects === null && (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
