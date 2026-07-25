@@ -139,7 +139,7 @@ export default function ProjectExecutionsPage() {
                     <TableRow
                       key={row.executionId}
                       component={RouterLink}
-                      to={`executions/${row.executionId}`}
+                      to={row.executionId}
                       sx={{ cursor: 'pointer', textDecoration: 'none', '& > td': { color: 'text.primary' } }}
                     >
                       <TableCell sx={{ fontWeight: 700 }}>#{row.executionId}</TableCell>
