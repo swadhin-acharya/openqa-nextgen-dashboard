@@ -24,10 +24,10 @@ export const navItems: NavItem[] = [
   { label: 'Features', path: '/features', icon: CategoryRoundedIcon, enabled: true },
   { label: 'Tests', path: '/tests', icon: FactCheckRoundedIcon, enabled: true },
   { label: 'Failure Analysis', path: '/failure-analysis', icon: ReportProblemRoundedIcon, enabled: true },
-  { label: 'Timeline', path: '/timeline', icon: TimelineRoundedIcon, enabled: false },
+  { label: 'Timeline', path: '/timeline', icon: TimelineRoundedIcon, enabled: true },
   { label: 'Retries', path: '/retries', icon: ReplayRoundedIcon, enabled: true },
-  { label: 'Trends', path: '/trends', icon: TrendingUpRoundedIcon, enabled: false },
-  { label: 'History', path: '/history', icon: HistoryRoundedIcon, enabled: false },
+  { label: 'Trends', path: '/trends', icon: TrendingUpRoundedIcon, enabled: true },
+  { label: 'History', path: '/history', icon: HistoryRoundedIcon, enabled: true },
   // Aliases the Executions list - this product's mental model has no
   // separate "report definition" concept; a report IS an execution's report.
   { label: 'Reports', path: '/executions', icon: DescriptionRoundedIcon, enabled: true },

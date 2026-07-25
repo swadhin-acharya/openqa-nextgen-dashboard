@@ -18,6 +18,7 @@ import {
   type ExecutionMeta,
 } from './history-db.js'
 import { resolveSuiteId } from './suites.js'
+import { appendExecutionLog } from './executionLog.js'
 import { getServiceRoleClient } from './db.js'
 
 export interface ProcessExecutionForProjectOptions {
@@ -167,6 +168,10 @@ export async function processExecutionForProject(
     // aggregate - what Overview reads - completely untouched.
     await writeExecutionsMetaAndTests(options.projectId, updatedMeta, updatedTests)
   }
+
+  // Unbounded ledger for the History page - every execution, regardless of
+  // branch or the capped retention above (see supabase/migrations/0008_execution_log.sql).
+  await appendExecutionLog(options.projectId, executionId, meta)
 
   return { execution, suiteId, branch, mergedIntoMainDashboard }
 }

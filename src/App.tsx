@@ -16,6 +16,9 @@ import ProjectTestsPage from './pages/ProjectTestsPage'
 import ProjectEnvironmentPage from './pages/ProjectEnvironmentPage'
 import ProjectFailureAnalysisPage from './pages/ProjectFailureAnalysisPage'
 import ProjectRetriesPage from './pages/ProjectRetriesPage'
+import ProjectTrendsPage from './pages/ProjectTrendsPage'
+import ProjectTimelinePage from './pages/ProjectTimelinePage'
+import ProjectHistoryPage from './pages/ProjectHistoryPage'
 import TokensPage from './pages/TokensPage'
 
 export default function App() {
@@ -58,6 +61,9 @@ export default function App() {
           <Route path="environment" element={<ProjectEnvironmentPage />} />
           <Route path="failure-analysis" element={<ProjectFailureAnalysisPage />} />
           <Route path="retries" element={<ProjectRetriesPage />} />
+          <Route path="trends" element={<ProjectTrendsPage />} />
+          <Route path="timeline" element={<ProjectTimelinePage />} />
+          <Route path="history" element={<ProjectHistoryPage />} />
           <Route path="tokens" element={<TokensPage />} />
         </Route>
       </Route>
