@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link as RouterLink } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   Table,
   TableBody,
@@ -36,6 +36,7 @@ const ALL = '__all__'
 
 export default function ProjectExecutionsPage() {
   const project = useProject()
+  const navigate = useNavigate()
   const { rows, suites, loading, error } = useExecutionsList(project.projectId)
 
   const [suiteFilter, setSuiteFilter] = useState(ALL)
@@ -138,9 +139,9 @@ export default function ProjectExecutionsPage() {
                   {filteredRows.map((row) => (
                     <TableRow
                       key={row.executionId}
-                      component={RouterLink}
-                      to={row.executionId}
-                      sx={{ cursor: 'pointer', textDecoration: 'none', '& > td': { color: 'text.primary' } }}
+                      hover
+                      onClick={() => navigate(row.executionId)}
+                      sx={{ cursor: 'pointer' }}
                     >
                       <TableCell sx={{ fontWeight: 700 }}>#{row.executionId}</TableCell>
                       <TableCell>
