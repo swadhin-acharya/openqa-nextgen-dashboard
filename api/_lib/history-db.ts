@@ -101,6 +101,7 @@ export async function writeDashboardDataToDb(
   contributions: Record<string, string[]>,
   executionsMeta: ExecutionsMeta,
   executionTests: ExecutionTestsMap,
+  rawEnvironment: Record<string, string>,
 ): Promise<void> {
   const supabase = getServiceRoleClient()
   const { error } = await supabase.from('dashboard_data').upsert({
@@ -113,6 +114,7 @@ export async function writeDashboardDataToDb(
     failures: data.failures,
     categories: data.categories,
     environment: data.environment,
+    raw_environment: rawEnvironment,
     failure_contributions: contributions,
     executions_meta: executionsMeta,
     execution_tests: executionTests,

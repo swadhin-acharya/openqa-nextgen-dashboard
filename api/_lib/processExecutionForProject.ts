@@ -154,7 +154,14 @@ export async function processExecutionForProject(
       environment: execution.environment ?? {},
     }
 
-    await writeDashboardDataToDb(options.projectId, data, mergedFailureState.contributions, updatedMeta, updatedTests)
+    await writeDashboardDataToDb(
+      options.projectId,
+      data,
+      mergedFailureState.contributions,
+      updatedMeta,
+      updatedTests,
+      raw.environment,
+    )
   } else {
     // Non-main branch: record it (meta/tests above) but leave the vendored
     // aggregate - what Overview reads - completely untouched.

@@ -21,8 +21,8 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { label: 'Overview', path: '/', icon: GridViewRoundedIcon, enabled: true },
   { label: 'Executions', path: '/executions', icon: PlayCircleOutlineRoundedIcon, enabled: true },
-  { label: 'Features', path: '/features', icon: CategoryRoundedIcon, enabled: false },
-  { label: 'Tests', path: '/tests', icon: FactCheckRoundedIcon, enabled: false },
+  { label: 'Features', path: '/features', icon: CategoryRoundedIcon, enabled: true },
+  { label: 'Tests', path: '/tests', icon: FactCheckRoundedIcon, enabled: true },
   { label: 'Failure Analysis', path: '/failure-analysis', icon: ReportProblemRoundedIcon, enabled: false },
   { label: 'Timeline', path: '/timeline', icon: TimelineRoundedIcon, enabled: false },
   { label: 'Retries', path: '/retries', icon: ReplayRoundedIcon, enabled: false },
@@ -31,5 +31,5 @@ export const navItems: NavItem[] = [
   // Aliases the Executions list - this product's mental model has no
   // separate "report definition" concept; a report IS an execution's report.
   { label: 'Reports', path: '/executions', icon: DescriptionRoundedIcon, enabled: true },
-  { label: 'Environment', path: '/environment', icon: PublicRoundedIcon, enabled: false },
+  { label: 'Environment', path: '/environment', icon: PublicRoundedIcon, enabled: true },
 ]
