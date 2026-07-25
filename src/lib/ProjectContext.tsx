@@ -8,6 +8,7 @@ export interface ProjectContextValue {
   projectId: string
   name: string
   slug: string
+  logoUrl: string | null
   /** dashboard_data.updated_at for this project, or null if no run has been ingested yet. */
   lastUpdated: string | null
 }
@@ -45,7 +46,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
 
       const { data: project } = await supabase
         .from('projects')
-        .select('id, name, slug')
+        .select('id, name, slug, logo_url')
         .eq('slug', slug)
         .maybeSingle()
 
@@ -68,6 +69,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
           projectId: project.id,
           name: project.name,
           slug: project.slug,
+          logoUrl: project.logo_url,
           lastUpdated: dashboardRow?.updated_at ?? null,
         },
       })

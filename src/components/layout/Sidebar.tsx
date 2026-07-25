@@ -1,4 +1,4 @@
-import { Box, Typography, Tooltip, Link as MuiLink, alpha, useTheme } from '@mui/material'
+import { Box, Typography, Tooltip, Link as MuiLink, Avatar, alpha, useTheme } from '@mui/material'
 import { Stack } from '../FlexStack'
 import { NavLink, Link as RouterLink } from 'react-router-dom'
 import { navItems } from '../../config/navigation'
@@ -39,9 +39,21 @@ export function Sidebar() {
         </Typography>
       </Box>
 
-      <Box sx={{ px: 2.5, py: 1.5, borderBottom: `1px solid ${theme.palette.divider}` }}>
+      <Stack
+        direction="row"
+        spacing={1.25}
+        sx={{ alignItems: 'center', px: 2.5, py: 1.5, borderBottom: `1px solid ${theme.palette.divider}` }}
+      >
+        <Avatar
+          src={project.logoUrl ?? undefined}
+          variant="rounded"
+          sx={{ width: 28, height: 28, fontSize: '0.8rem', bgcolor: alpha(theme.palette.primary.main, 0.16), color: 'primary.light' }}
+        >
+          {project.name.charAt(0).toUpperCase()}
+        </Avatar>
         <Typography
           variant="caption"
+          noWrap
           sx={{
             color: 'primary.light',
             fontWeight: 700,
@@ -51,7 +63,7 @@ export function Sidebar() {
         >
           {project.name}
         </Typography>
-      </Box>
+      </Stack>
 
       <Stack sx={{ flex: 1, py: 1.5, px: 1.25, gap: 0.25, overflowY: 'auto' }}>
         {navItems.map((item) => {

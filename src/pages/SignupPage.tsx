@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { Box, Paper, TextField, Button, Typography, Alert, Stack } from '@mui/material'
+import { Paper, TextField, Button, Typography, Alert, Stack } from '@mui/material'
+import { AuthLayout } from '../components/layout/AuthLayout'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../lib/AuthContext'
 
@@ -35,12 +36,15 @@ export default function SignupPage() {
   }
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center' }}>
-      <Paper sx={{ p: 4, width: 360 }} component="form" onSubmit={handleSubmit}>
+    <AuthLayout>
+      <Paper elevation={0} sx={{ p: 4, width: 360 }} component="form" onSubmit={handleSubmit}>
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
-          Sign up
+          Create your account
         </Typography>
-        <Stack spacing={2} sx={{ mt: 2 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Start hosting your team's automation results
+        </Typography>
+        <Stack spacing={2}>
           {error && <Alert severity="error">{error}</Alert>}
           {info && <Alert severity="info">{info}</Alert>}
           <TextField
@@ -50,6 +54,7 @@ export default function SignupPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
             fullWidth
+            autoFocus
           />
           <TextField
             label="Password"
@@ -60,7 +65,7 @@ export default function SignupPage() {
             fullWidth
             helperText="At least 6 characters"
           />
-          <Button type="submit" variant="contained" disabled={submitting} fullWidth>
+          <Button type="submit" variant="contained" disabled={submitting} fullWidth size="large">
             {submitting ? 'Creating account…' : 'Sign up'}
           </Button>
           <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
@@ -68,6 +73,6 @@ export default function SignupPage() {
           </Typography>
         </Stack>
       </Paper>
-    </Box>
+    </AuthLayout>
   )
 }

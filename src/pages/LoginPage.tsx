@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { Box, Paper, TextField, Button, Typography, Alert, Stack } from '@mui/material'
+import { Paper, TextField, Button, Typography, Alert, Stack } from '@mui/material'
+import { AuthLayout } from '../components/layout/AuthLayout'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../lib/AuthContext'
 
@@ -23,12 +24,15 @@ export default function LoginPage() {
   }
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center' }}>
-      <Paper sx={{ p: 4, width: 360 }} component="form" onSubmit={handleSubmit}>
+    <AuthLayout>
+      <Paper elevation={0} sx={{ p: 4, width: 360 }} component="form" onSubmit={handleSubmit}>
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
-          Log in
+          Welcome back
         </Typography>
-        <Stack spacing={2} sx={{ mt: 2 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Log in to your OpenQA account
+        </Typography>
+        <Stack spacing={2}>
           {error && <Alert severity="error">{error}</Alert>}
           <TextField
             label="Email"
@@ -37,6 +41,7 @@ export default function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
             fullWidth
+            autoFocus
           />
           <TextField
             label="Password"
@@ -46,7 +51,7 @@ export default function LoginPage() {
             required
             fullWidth
           />
-          <Button type="submit" variant="contained" disabled={submitting} fullWidth>
+          <Button type="submit" variant="contained" disabled={submitting} fullWidth size="large">
             {submitting ? 'Logging in…' : 'Log in'}
           </Button>
           <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
@@ -54,6 +59,6 @@ export default function LoginPage() {
           </Typography>
         </Stack>
       </Paper>
-    </Box>
+    </AuthLayout>
   )
 }
