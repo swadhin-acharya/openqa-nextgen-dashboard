@@ -33,7 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const tokenHash = hashPat(token)
   const { data: patRow, error: patError } = await supabase
     .from('personal_access_tokens')
-    .select('id, project_id')
+    .select('id, project_id, user_id')
     .eq('token_hash', tokenHash)
     .is('revoked_at', null)
     .maybeSingle()
@@ -48,6 +48,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .from('personal_access_tokens')
     .update({ last_used_at: new Date().toISOString() })
     .eq('id', patRow.id)
+
+  // Attribute this execution to whichever member's PAT pushed it ("executor"
+  // in the Executions page's filters, distinct from Allure's own CI executor
+  // concept). Best-effort - a lookup failure shouldn't fail the ingest.
+  const { data: executorUser } = await supabase.auth.admin.getUserById(patRow.user_id)
+  const executedByEmail = executorUser?.user?.email ?? null
 
   let tmpDir: string | null = null
   try {
@@ -79,12 +85,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (f.startsWith('._')) unlinkSync(join(allureResultsDir, f))
     }
 
-    const data = await processExecutionForProject({
+    const result = await processExecutionForProject({
       projectId: patRow.project_id,
       allureResultsDir,
+      executedByEmail,
     })
 
-    const current = data.summary.current
+    const current = result.execution
     res.status(200).json({
       executionId: current.executionId,
       total: current.total,
@@ -93,6 +100,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       broken: current.broken,
       skipped: current.skipped,
       passRate: current.passRate,
+      branch: result.branch,
+      mergedIntoMainDashboard: result.mergedIntoMainDashboard,
     })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
