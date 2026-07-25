@@ -149,10 +149,10 @@ export default function ProjectExecutionsPage() {
                       <TableCell>{row.suiteName}</TableCell>
                       <TableCell>{row.branch ?? '—'}</TableCell>
                       <TableCell>{row.executedByEmail ?? '—'}</TableCell>
-                      <TableCell>{formatNumber(row.total)}</TableCell>
-                      <TableCell>{formatPercent(row.passRate)}</TableCell>
-                      <TableCell sx={{ color: 'text.secondary' }}>{formatDuration(row.duration)}</TableCell>
-                      <TableCell sx={{ color: 'text.secondary' }}>{formatDateTime(row.date)}</TableCell>
+                      <TableCell>{formatNumber(row.total ?? 0)}</TableCell>
+                      <TableCell>{formatPercent(row.passRate ?? 0)}</TableCell>
+                      <TableCell sx={{ color: 'text.secondary' }}>{formatDuration(row.duration ?? 0)}</TableCell>
+                      <TableCell sx={{ color: 'text.secondary' }}>{row.date ? formatDateTime(row.date) : '—'}</TableCell>
                       <TableCell>
                         {!row.mergedIntoMainDashboard && (
                           <Tooltip title={`Excluded from the main dashboard (branch "${row.branch}" isn't this project's main branch)`}>

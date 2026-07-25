@@ -43,7 +43,11 @@ export default function ExecutionReportPage() {
     <Stack>
       <PageHeader
         title={`Execution #${executionId}`}
-        subtitle={meta ? `${data?.suiteName ?? 'Default'} · ${meta.branch ?? 'no branch'} · ${formatDateTime(meta.date)}` : undefined}
+        subtitle={
+          meta
+            ? `${data?.suiteName ?? 'Default'} · ${meta.branch ?? 'no branch'} · ${meta.date ? formatDateTime(meta.date) : 'unknown date'}`
+            : undefined
+        }
         actions={
           <Button component={RouterLink} to=".." variant="text" size="small">
             ← Executions
@@ -70,16 +74,16 @@ export default function ExecutionReportPage() {
 
           <Grid container spacing={2}>
             <Grid size={{ xs: 6, sm: 3 }}>
-              <Stat label="Total" value={formatNumber(meta.total)} />
+              <Stat label="Total" value={formatNumber(meta.total ?? 0)} />
             </Grid>
             <Grid size={{ xs: 6, sm: 3 }}>
-              <Stat label="Pass Rate" value={formatPercent(meta.passRate)} />
+              <Stat label="Pass Rate" value={formatPercent(meta.passRate ?? 0)} />
             </Grid>
             <Grid size={{ xs: 6, sm: 3 }}>
-              <Stat label="Duration" value={formatDuration(meta.duration)} />
+              <Stat label="Duration" value={formatDuration(meta.duration ?? 0)} />
             </Grid>
             <Grid size={{ xs: 6, sm: 3 }}>
-              <Stat label="Passed / Failed / Broken" value={`${meta.passed} / ${meta.failed} / ${meta.broken}`} />
+              <Stat label="Passed / Failed / Broken" value={`${meta.passed ?? 0} / ${meta.failed ?? 0} / ${meta.broken ?? 0}`} />
             </Grid>
           </Grid>
 

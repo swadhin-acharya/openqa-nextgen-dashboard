@@ -56,7 +56,7 @@ export function useExecutionsList(projectId: string): FetchState {
           ...m,
           suiteName: (m.suiteId && suiteNameById.get(m.suiteId)) || 'Default',
         }))
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .sort((a, b) => new Date(b.date ?? 0).getTime() - new Date(a.date ?? 0).getTime())
 
       setState({ rows, suites, loading: false, error: null })
     }
