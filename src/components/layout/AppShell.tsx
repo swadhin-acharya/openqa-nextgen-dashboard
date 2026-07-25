@@ -1,6 +1,7 @@
 import { Box } from '@mui/material'
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
+import { LiveExecutionBanner } from '../LiveExecutionBanner'
 
 export function AppShell() {
   return (
@@ -16,6 +17,7 @@ export function AppShell() {
           maxWidth: 1920,
         }}
       >
+        <LiveExecutionBanner />
         <Outlet />
       </Box>
     </Box>

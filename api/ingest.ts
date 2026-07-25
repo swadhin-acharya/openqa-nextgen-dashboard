@@ -6,6 +6,7 @@ import * as tar from 'tar'
 import { getServiceRoleClient } from './_lib/db.js'
 import { extractBearerToken, hashPat } from './_lib/pat.js'
 import { processExecutionForProject } from './_lib/processExecutionForProject.js'
+import { upsertLiveExecution, clearLiveExecution } from './_lib/liveExecution.js'
 
 // Body is JSON { archive: "<base64 gzip tarball>" }, not a raw binary POST
 // body. Vercel's Node runtime does its own body handling ahead of the
@@ -62,11 +63,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const executedByName = executorProfile?.name ?? null
   const executedByEmail = executorProfile?.email ?? null
 
+  // Phase 10: a run-in-progress polls this same endpoint every ~15-30s with
+  // inProgress: true and a client-chosen executionId that stays constant
+  // across the whole run (including the final, non-inProgress call) - that
+  // shared id is how the completion call knows which live_executions row to
+  // clear. Omitting executionId entirely just behaves exactly as before
+  // Phase 10 (no live row, no clearing, id defaults inside
+  // processExecutionForProject) - live visibility is opt-in per caller.
+  const inProgress = req.body?.inProgress === true
+  const executionId = typeof req.body?.executionId === 'string' ? req.body.executionId : undefined
+
   let tmpDir: string | null = null
   try {
     const archive = req.body?.archive
     if (typeof archive !== 'string' || archive.length === 0) {
       res.status(400).json({ error: 'Expected JSON body { archive: "<base64 gzip tarball of allure-results>" }' })
+      return
+    }
+    if (inProgress && !executionId) {
+      res.status(400).json({ error: 'inProgress: true requires an executionId so repeated polls target the same run' })
       return
     }
     const body = Buffer.from(archive, 'base64')
@@ -92,12 +107,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (f.startsWith('._')) unlinkSync(join(allureResultsDir, f))
     }
 
+    if (inProgress) {
+      // Never touches dashboard_data/executions_meta/execution_log - see
+      // liveExecution.ts and the migration's header comment for why this
+      // has to be a completely separate write path.
+      const snapshot = await upsertLiveExecution({
+        projectId: patRow.project_id,
+        allureResultsDir,
+        executionId: executionId!,
+        executedByUserId: patRow.user_id,
+        executedByName,
+      })
+      res.status(200).json({
+        live: true,
+        executionId: executionId!,
+        total: snapshot.execution.total,
+        passed: snapshot.execution.passed,
+        failed: snapshot.execution.failed,
+        broken: snapshot.execution.broken,
+        skipped: snapshot.execution.skipped,
+        branch: snapshot.branch,
+      })
+      return
+    }
+
     const result = await processExecutionForProject({
       projectId: patRow.project_id,
       allureResultsDir,
+      executionId,
       executedByName,
       executedByEmail,
     })
+
+    // The run is complete - if this execution had a live row (from earlier
+    // inProgress polls sharing the same executionId), clear it now that the
+    // real historical record has landed. A no-op if there wasn't one.
+    if (executionId) {
+      await clearLiveExecution(patRow.project_id, executionId)
+    }
 
     const current = result.execution
     res.status(200).json({
