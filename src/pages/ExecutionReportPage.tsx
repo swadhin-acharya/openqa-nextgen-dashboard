@@ -62,12 +62,19 @@ export default function ExecutionReportPage() {
 
   async function handleViewReport() {
     if (!session || !executionId) return
+    // Open the tab synchronously, inside the click handler, before the
+    // await below - browsers only treat window.open() as a real user
+    // gesture (not a blocked popup) when it happens synchronously in the
+    // same event handler that triggered it. Opening it after the fetch
+    // resolves gets silently blocked with no console error.
+    const newTab = window.open('', '_blank')
     setReportBusy('view')
     setReportError(null)
     try {
       const blob = await fetchReportBlob(project.projectId, executionId, session.access_token, false)
-      window.open(URL.createObjectURL(blob), '_blank')
+      if (newTab) newTab.location.href = URL.createObjectURL(blob)
     } catch (err) {
+      newTab?.close()
       setReportError(err instanceof Error ? err.message : 'Report not available')
     } finally {
       setReportBusy(null)
