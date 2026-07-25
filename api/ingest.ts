@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync, unlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import * as tar from 'tar'
@@ -66,6 +66,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     writeFileSync(tarballPath, body)
     mkdirSync(allureResultsDir, { recursive: true })
     await tar.x({ file: tarballPath, cwd: allureResultsDir })
+
+    // macOS's tar can silently include AppleDouble metadata sidecar files
+    // (e.g. "._abc-result.json" alongside "abc-result.json") when archiving
+    // from a filesystem with extended attributes. Their name also matches
+    // the "*-result.json" suffix reader.ts filters on, but their content is
+    // binary AppleDouble data, not JSON - traced a real ingest failure to
+    // exactly this. Building the tarball with COPYFILE_DISABLE=1 prevents
+    // macOS from creating them in the first place, but stripping them here
+    // too means the API doesn't depend on every client remembering that.
+    for (const f of readdirSync(allureResultsDir)) {
+      if (f.startsWith('._')) unlinkSync(join(allureResultsDir, f))
+    }
 
     const data = await processExecutionForProject({
       projectId: patRow.project_id,
