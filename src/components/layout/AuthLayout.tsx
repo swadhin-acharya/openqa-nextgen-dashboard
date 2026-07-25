@@ -1,56 +1,47 @@
-import { Box, Typography, Stack, alpha, useTheme } from '@mui/material'
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
+import { Box, alpha, useTheme } from '@mui/material'
 import type { ReactNode } from 'react'
 import openQaLogo from '../../assets/logoOpenQA.png'
-
-const PITCH_POINTS = [
-  'Hosted Allure analytics - no build pipeline to maintain',
-  'Per-member access tokens, scoped to a project',
-  'One dashboard your whole team can share',
-]
+import { QAPatternPanel } from '../auth/QAPatternPanel'
 
 /**
- * Shared branded chrome for LoginPage/SignupPage - a left panel with the
- * wordmark and pitch, form content on the right. Uses theme tokens (not
- * hardcoded colors) so it respects the light/dark toggle, which persists
- * across sessions via ThemeModeContext even before the user logs in.
+ * Shared shell for LoginPage/SignupPage: form column on the left (logo +
+ * whatever heading/fields the page provides as children), a decorative
+ * QA-icon lattice on the right (QAPatternPanel) - hidden below md since it's
+ * purely decorative and the form needs the full width on small screens.
  */
 export function AuthLayout({ children }: { children: ReactNode }) {
   const theme = useTheme()
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
       <Box
         sx={{
           flex: 1,
-          display: { xs: 'none', md: 'flex' },
+          display: 'flex',
           flexDirection: 'column',
+          alignItems: 'center',
           justifyContent: 'center',
-          // A flex column's default alignItems is "stretch" - without this,
-          // the logo (a fixed-height img with no explicit width) gets
-          // stretched to the full panel width, squashing its 2:1 aspect
-          // ratio into an illegible smear. flex-start lets it size naturally.
-          alignItems: 'flex-start',
-          px: 8,
-          background: `linear-gradient(160deg, ${alpha(theme.palette.primary.main, 0.16)}, ${theme.palette.background.default})`,
-          borderRight: `1px solid ${theme.palette.divider}`,
+          px: { xs: 3, sm: 6 },
+          py: 4,
         }}
       >
-        <Box component="img" src={openQaLogo} alt="OpenQA" sx={{ height: 48, width: 'auto', display: 'block', mb: 2 }} />
-        <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>
-          NextGen Dashboard
-        </Typography>
-        <Stack spacing={1.5} sx={{ maxWidth: 380 }}>
-          {PITCH_POINTS.map((point) => (
-            <Stack key={point} direction="row" spacing={1.25} sx={{ alignItems: 'flex-start' }}>
-              <CheckCircleRoundedIcon sx={{ fontSize: 18, color: 'success.main', mt: 0.25 }} />
-              <Typography color="text.secondary">{point}</Typography>
-            </Stack>
-          ))}
-        </Stack>
+        <Box sx={{ width: '100%', maxWidth: 400 }}>
+          <Box component="img" src={openQaLogo} alt="OpenQA Dashboard" sx={{ height: 40, width: 'auto', display: 'block', mb: 4 }} />
+          {children}
+        </Box>
       </Box>
-      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', px: 3 }}>
-        {children}
+
+      <Box
+        sx={{
+          flex: { md: 0.8, lg: 1 },
+          display: { xs: 'none', md: 'block' },
+          position: 'relative',
+          overflow: 'hidden',
+          background: `linear-gradient(160deg, ${alpha(theme.palette.primary.main, 0.14)}, ${theme.palette.background.paper})`,
+          borderLeft: `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        <QAPatternPanel />
       </Box>
     </Box>
   )
