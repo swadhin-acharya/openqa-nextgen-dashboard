@@ -135,8 +135,9 @@ export default function OrgHomePage() {
     load()
   }, [org.orgId])
 
-  // Skip straight into the one project when there's only one.
-  if (projects !== null && projects.length === 1) {
+  // Skip straight into the one project when there's only one - but not for
+  // this org's owner, who needs to be able to reach "New project" here.
+  if (projects !== null && projects.length === 1 && org.role !== 'owner') {
     return <Navigate to={`/${org.slug}/${projects[0].slug}`} replace />
   }
 

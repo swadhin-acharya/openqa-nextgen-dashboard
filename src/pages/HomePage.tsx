@@ -124,10 +124,11 @@ export default function HomePage() {
     load()
   }, [])
 
-  // Skip the org-selection screen entirely when there's only one
-  // organization to pick from - go straight to it (which itself skips down
-  // into its one project if there's only one, see OrgHomePage.tsx).
-  if (orgs !== null && orgs.length === 1) {
+  // Skip the org-selection screen when there's only one organization to
+  // pick from - but only for non-admins. An admin always needs to be able
+  // to reach this list to create another org; skipping past it would make
+  // "New organization" structurally unreachable once one org exists.
+  if (orgs !== null && orgs.length === 1 && !isAdmin) {
     return <Navigate to={`/${orgs[0].slug}`} replace />
   }
 

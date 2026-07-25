@@ -6,6 +6,7 @@ import { useOrg } from '../../lib/OrgContext'
 import { useProject } from '../../lib/ProjectContext'
 import { supabase } from '../../lib/supabaseClient'
 import { formatDateTime } from '../../utils/format'
+import openQaLogo from '../../assets/logoOpenQA.png'
 
 export const SIDEBAR_WIDTH = 248
 
@@ -35,12 +36,7 @@ export function Sidebar() {
         to="/"
         sx={{ display: 'block', px: 2.5, py: 2.75, borderBottom: `1px solid ${theme.palette.divider}`, textDecoration: 'none' }}
       >
-        <Typography
-          variant="subtitle2"
-          sx={{ letterSpacing: 0.3, fontWeight: 700, fontSize: '1.05rem', lineHeight: 1.2, color: 'primary.light' }}
-        >
-          OpenQA
-        </Typography>
+        <Box component="img" src={openQaLogo} alt="OpenQA" sx={{ height: 26, display: 'block', mb: 0.5 }} />
         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           NextGen Dashboard
         </Typography>

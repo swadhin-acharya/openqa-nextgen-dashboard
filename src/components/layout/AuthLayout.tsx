@@ -1,6 +1,7 @@
 import { Box, Typography, Stack, alpha, useTheme } from '@mui/material'
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
 import type { ReactNode } from 'react'
+import openQaLogo from '../../assets/logoOpenQA.png'
 
 const PITCH_POINTS = [
   'Hosted Allure analytics - no build pipeline to maintain',
@@ -30,9 +31,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           borderRight: `1px solid ${theme.palette.divider}`,
         }}
       >
-        <Typography variant="h3" sx={{ fontWeight: 700, color: 'primary.light' }}>
-          OpenQA
-        </Typography>
+        <Box component="img" src={openQaLogo} alt="OpenQA" sx={{ height: 56, display: 'block', mb: 1 }} />
         <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>
           NextGen Dashboard
         </Typography>
