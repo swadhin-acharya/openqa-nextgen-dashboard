@@ -1,0 +1,1191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Execution #142 · Denali Mobile Regression · OpenQA Report</title>
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --bg:#f4f6fb;
+  --surface:#ffffff;
+  --surface-2:#eef1f8;
+  --border:#e1e5ef;
+  --text:#12151f;
+  --text-muted:#5c6478;
+  --text-faint:#8b93a0;
+  --accent:#5b6cf9;
+  --accent-dark:#3f4bd1;
+  --accent-soft:rgba(91,108,249,.10);
+  --pass:#178a56;
+  --pass-fill:#2ecc8f;
+  --fail:#d3273e;
+  --fail-fill:#f2495c;
+  --broken:#b5590a;
+  --broken-fill:#ff9f43;
+  --skip:#93650a;
+  --skip-fill:#f4c542;
+  --code-bg:#0e1320;
+  --code-text:#d7e0f5;
+  --shadow:0 1px 2px rgba(15,20,30,.04), 0 8px 24px rgba(15,20,30,.06);
+  --radius:14px;
+  --radius-sm:9px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0b0e17;
+    --surface:#131826;
+    --surface-2:#171d2e;
+    --border:rgba(255,255,255,.09);
+    --text:#eef1f8;
+    --text-muted:#9aa2b8;
+    --text-faint:#6b7385;
+    --accent:#8590ff;
+    --accent-dark:#aab3ff;
+    --accent-soft:rgba(133,144,255,.14);
+    --pass:#2ecc8f;
+    --pass-fill:#2ecc8f;
+    --fail:#f2495c;
+    --fail-fill:#f2495c;
+    --broken:#ff9f43;
+    --broken-fill:#ff9f43;
+    --skip:#f4c542;
+    --skip-fill:#f4c542;
+    --code-bg:#0a0d16;
+    --code-text:#cfd8ef;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 28px rgba(0,0,0,.4);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b0e17; --surface:#131826; --surface-2:#171d2e; --border:rgba(255,255,255,.09);
+  --text:#eef1f8; --text-muted:#9aa2b8; --text-faint:#6b7385;
+  --accent:#8590ff; --accent-dark:#aab3ff; --accent-soft:rgba(133,144,255,.14);
+  --pass:#2ecc8f; --pass-fill:#2ecc8f; --fail:#f2495c; --fail-fill:#f2495c;
+  --broken:#ff9f43; --broken-fill:#ff9f43; --skip:#f4c542; --skip-fill:#f4c542;
+  --code-bg:#0a0d16; --code-text:#cfd8ef;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 28px rgba(0,0,0,.4);
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#f4f6fb; --surface:#ffffff; --surface-2:#eef1f8; --border:#e1e5ef;
+  --text:#12151f; --text-muted:#5c6478; --text-faint:#8b93a0;
+  --accent:#5b6cf9; --accent-dark:#3f4bd1; --accent-soft:rgba(91,108,249,.10);
+  --pass:#178a56; --pass-fill:#2ecc8f; --fail:#d3273e; --fail-fill:#f2495c;
+  --broken:#b5590a; --broken-fill:#ff9f43; --skip:#93650a; --skip-fill:#f4c542;
+  --code-bg:#0e1320; --code-text:#d7e0f5;
+  --shadow:0 1px 2px rgba(15,20,30,.04), 0 8px 24px rgba(15,20,30,.06);
+  color-scheme:light;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{margin:0; text-wrap:balance; font-weight:700}
+.tnum{font-variant-numeric:tabular-nums}
+.eyebrow{font-size:10.5px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--text-faint)}
+a{color:var(--accent)}
+button{font-family:inherit}
+::selection{background:var(--accent-soft)}
+
+/* ============================================================
+   LAYOUT SHELL
+   ============================================================ */
+.wrap{max-width:1320px; margin:0 auto; padding:0 28px}
+@media (max-width:720px){ .wrap{padding:0 16px} }
+
+.topbar{
+  position:sticky; top:0; z-index:50;
+  background:color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.topbar-inner{display:flex; align-items:center; gap:22px; padding:12px 28px; max-width:1320px; margin:0 auto}
+.brand{display:flex; align-items:baseline; gap:8px; font-weight:800; font-size:15px; white-space:nowrap}
+.brand b{color:var(--accent)}
+.brand .divider{width:1px; height:14px; background:var(--border)}
+.brand .kind{color:var(--text-muted); font-weight:600; font-size:12px; letter-spacing:.04em; text-transform:uppercase}
+.topnav{display:flex; gap:2px; flex:1; overflow-x:auto}
+.topnav a{
+  color:var(--text-muted); text-decoration:none; font-size:12.5px; font-weight:600;
+  padding:7px 11px; border-radius:7px; white-space:nowrap; transition:background .12s,color .12s;
+}
+.topnav a:hover{background:var(--surface-2); color:var(--text)}
+.topbar-actions{display:flex; align-items:center; gap:8px}
+.btn{
+  display:inline-flex; align-items:center; gap:6px; cursor:pointer; border:1px solid var(--border);
+  background:var(--surface); color:var(--text); font-size:12.5px; font-weight:600;
+  padding:7px 12px; border-radius:8px; transition:border-color .12s, background .12s;
+}
+.btn:hover{border-color:var(--accent)}
+.btn:focus-visible, a:focus-visible, [tabindex]:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.btn.icon{padding:7px 8px}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+.btn.primary:hover{background:var(--accent-dark); border-color:var(--accent-dark)}
+
+@media print{
+  .topbar,.no-print{display:none !important}
+  body{background:#fff; color:#111}
+  .card{box-shadow:none !important; border:1px solid #ddd !important; break-inside:avoid}
+  a{color:inherit; text-decoration:none}
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{padding:28px 0 8px}
+.hero-card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:24px 26px; display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap;
+}
+.hero-left .eyebrow{margin-bottom:6px}
+.hero h1{font-size:23px}
+.hero .meta-line{color:var(--text-muted); font-size:13px; margin-top:8px; display:flex; gap:14px; flex-wrap:wrap}
+.hero .meta-line span{display:inline-flex; align-items:center; gap:6px}
+.hero .meta-line .dot{width:3px;height:3px;border-radius:50%;background:var(--text-faint)}
+.hero-right{display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap:10px}
+.status-pill{
+  font-size:12.5px; font-weight:800; letter-spacing:.03em; padding:7px 16px; border-radius:999px;
+  text-transform:uppercase;
+}
+.status-pill.FAILED{background:color-mix(in srgb, var(--fail-fill) 16%, transparent); color:var(--fail); border:1px solid color-mix(in srgb, var(--fail-fill) 40%, transparent)}
+.status-pill.PASSED{background:color-mix(in srgb, var(--pass-fill) 16%, transparent); color:var(--pass); border:1px solid color-mix(in srgb, var(--pass-fill) 40%, transparent)}
+.hero-meta-grid{display:grid; grid-template-columns:repeat(4,auto); gap:4px 26px; font-size:12.5px; color:var(--text-muted); text-align:right}
+.hero-meta-grid b{color:var(--text); font-weight:700}
+
+/* ============================================================
+   KPI STRIP
+   ============================================================ */
+.kpi-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:12px; margin:18px 0}
+@media (max-width:980px){.kpi-grid{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:600px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px 16px; box-shadow:var(--shadow)}
+.kpi .eyebrow{margin-bottom:6px}
+.kpi b{display:block; font-size:24px; font-weight:800}
+.kpi.pass b{color:var(--pass)} .kpi.fail b{color:var(--fail)} .kpi.broken b{color:var(--broken)} .kpi.skip b{color:var(--skip)}
+
+/* ============================================================
+   SECTIONS / CARDS
+   ============================================================ */
+section.block{margin:30px 0; scroll-margin-top:70px}
+.section-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px}
+.section-head h2{font-size:16px}
+.section-head .hint{color:var(--text-faint); font-size:12px}
+.card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px}
+.two-col{display:grid; grid-template-columns:1.35fr .95fr; gap:16px}
+@media (max-width:980px){.two-col{grid-template-columns:1fr}}
+
+/* Donut */
+.donut-wrap{display:flex; align-items:center; gap:22px; flex-wrap:wrap; justify-content:center}
+.legend{display:grid; gap:9px}
+.legend-row{display:flex; align-items:center; gap:9px; font-size:13px}
+.legend-row .sw{width:10px; height:10px; border-radius:3px}
+.legend-row b{margin-left:auto; padding-left:14px; font-weight:700}
+.legend-row .pct{color:var(--text-muted); width:48px; text-align:right}
+
+/* Failure analysis bars */
+.fa-row{display:grid; grid-template-columns:150px 1fr 30px; align-items:center; gap:10px; margin:9px 0; font-size:13px}
+.fa-row .fa-bar{height:9px; border-radius:5px; background:var(--surface-2); overflow:hidden}
+.fa-row .fa-bar i{display:block; height:100%; background:var(--accent); border-radius:5px}
+.fa-row.clickable{cursor:pointer}
+.fa-row.clickable:hover .fa-name{color:var(--accent)}
+
+/* Failed/broken list */
+.fail-item{border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:10px; overflow:hidden; background:var(--surface)}
+.fail-item summary{list-style:none; cursor:pointer; padding:13px 16px; display:flex; align-items:center; gap:12px}
+.fail-item summary::-webkit-details-marker{display:none}
+.fail-item .chev{transition:transform .15s; color:var(--text-faint); flex-shrink:0}
+.fail-item[open] .chev{transform:rotate(90deg)}
+.status-dot{width:9px; height:9px; border-radius:50%; flex-shrink:0}
+.status-dot.FAILED,.status-dot.BROKEN{background:var(--fail-fill)}
+.status-dot.BROKEN{background:var(--broken-fill)}
+.status-dot.PASSED{background:var(--pass-fill)}
+.status-dot.SKIPPED{background:var(--skip-fill)}
+.fail-item .ftitle{font-weight:700; flex:1}
+.fail-item .fcat{color:var(--text-muted); font-size:12.5px}
+.fail-item .fdur{color:var(--text-faint); font-size:12.5px; font-variant-numeric:tabular-nums}
+.fail-item .body{padding:0 16px 18px; border-top:1px solid var(--border)}
+
+/* Feature table */
+table.feature-table{width:100%; border-collapse:collapse}
+table.feature-table th{text-align:left; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--text-faint); font-weight:700; padding:0 10px 10px}
+table.feature-table td{padding:11px 10px; border-top:1px solid var(--border); font-size:13px; vertical-align:middle}
+table.feature-table tr.feature-row{cursor:pointer}
+table.feature-table tr.feature-row:hover td{background:var(--surface-2)}
+.health-bar{width:84px; height:6px; border-radius:4px; background:var(--surface-2); display:inline-block; margin-right:8px; vertical-align:middle; overflow:hidden}
+.health-bar i{display:block; height:100%; border-radius:4px}
+.feature-detail-row td{padding:0; border-top:none}
+.feature-detail{padding:4px 10px 16px 30px; display:none}
+.feature-detail.open{display:block}
+.mini-test{display:flex; align-items:center; gap:9px; padding:6px 0; font-size:12.8px; border-bottom:1px dashed var(--border)}
+.mini-test:last-child{border-bottom:none}
+.mini-test .name{flex:1}
+.mini-test .dur{color:var(--text-faint); font-variant-numeric:tabular-nums}
+
+/* Filters / test browser */
+.filter-bar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:14px}
+.chip{border:1px solid var(--border); background:var(--surface); color:var(--text-muted); font-size:12.5px; font-weight:700; padding:6px 13px; border-radius:999px; cursor:pointer; transition:.12s}
+.chip.active{background:var(--accent); border-color:var(--accent); color:#fff}
+.chip:hover:not(.active){border-color:var(--accent)}
+.filter-bar select, .filter-bar input[type="search"]{
+  border:1px solid var(--border); background:var(--surface); color:var(--text); border-radius:8px;
+  padding:7px 11px; font-size:12.8px; font-family:inherit;
+}
+.filter-bar input[type="search"]{min-width:220px; flex:1}
+.filter-bar .spacer{flex:1}
+.count-badge{color:var(--text-faint); font-size:12px}
+
+.test-row{border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:8px; background:var(--surface)}
+.test-row summary{list-style:none; cursor:pointer; padding:11px 14px; display:flex; align-items:center; gap:11px}
+.test-row summary::-webkit-details-marker{display:none}
+.test-row .name{flex:1; font-weight:600; font-size:13px}
+.test-row .feat{color:var(--text-muted); font-size:12px; padding:2px 8px; background:var(--surface-2); border-radius:6px}
+.test-row .dur{color:var(--text-faint); font-size:12px; width:52px; text-align:right; font-variant-numeric:tabular-nums}
+.test-row .chev{color:var(--text-faint); transition:transform .15s}
+.test-row[open] .chev{transform:rotate(90deg)}
+.test-row .body{padding:2px 16px 16px 39px; border-top:1px solid var(--border)}
+.hidden{display:none !important}
+
+/* Scenario detail */
+.sd-meta{display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:14px; margin:14px 0}
+.sd-meta div .eyebrow{margin-bottom:3px}
+.sd-meta div b{font-size:13px}
+.steps{list-style:none; margin:10px 0; padding:0}
+.steps li{display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px dashed var(--border); font-size:13px}
+.steps li:last-child{border-bottom:none}
+.steps li .sname{flex:1}
+.steps li .sdur{color:var(--text-faint); font-size:12px; font-variant-numeric:tabular-nums}
+.step-fail-detail{margin:6px 0 10px 19px; padding:10px 14px; background:var(--surface-2); border-left:3px solid var(--fail-fill); border-radius:6px; font-size:12.8px}
+.step-fail-detail div{margin:3px 0}
+.step-fail-detail b{color:var(--text-muted); font-weight:700; margin-right:6px}
+
+.failure-box{background:color-mix(in srgb, var(--fail-fill) 8%, var(--surface)); border:1px solid color-mix(in srgb, var(--fail-fill) 30%, var(--border)); border-radius:var(--radius-sm); padding:14px 16px; margin:14px 0}
+.failure-box .eyebrow{color:var(--fail)}
+.failure-box h4{font-size:13.5px; margin:4px 0 8px}
+.failure-box p{margin:4px 0; font-size:13px}
+
+.trace-wrap{position:relative; margin-top:8px}
+pre.code{
+  background:var(--code-bg); color:var(--code-text); padding:14px 16px; border-radius:9px; overflow:auto;
+  font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; white-space:pre; max-height:260px; margin:0;
+}
+.trace-wrap.collapsed pre.code{max-height:64px}
+.trace-fade{position:absolute; left:0; right:0; bottom:34px; height:34px; background:linear-gradient(transparent, var(--code-bg)); pointer-events:none; border-radius:0 0 9px 9px}
+.trace-wrap:not(.collapsed) .trace-fade{display:none}
+.code-actions{display:flex; gap:8px; margin-top:8px}
+.copy-btn{font-size:11.5px; padding:5px 10px}
+
+.attach-tabs{display:flex; gap:6px; flex-wrap:wrap; margin:14px 0 10px}
+.attach-tab{border:1px solid var(--border); background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; padding:6px 12px; border-radius:7px; cursor:pointer}
+.attach-tab.active{background:var(--accent-soft); border-color:var(--accent); color:var(--accent)}
+.attach-pane{display:none}
+.attach-pane.active{display:block}
+
+.log-toolbar{display:flex; gap:8px; align-items:center; margin-bottom:8px}
+.log-toolbar input[type="search"]{flex:1}
+.log-lines{background:var(--code-bg); color:var(--code-text); border-radius:9px; padding:12px 0; max-height:320px; overflow:auto; font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.log-line{padding:1px 16px; white-space:pre}
+.log-line.INFO{color:#9fb3e8}
+.log-line.ERROR{color:#ff8a93}
+.log-line.WARN{color:#ffcf8a}
+.log-line.hit{background:rgba(255,213,0,.18)}
+.log-line.hide{display:none}
+.nowrap-toggle .log-lines.nowrap .log-line{white-space:nowrap}
+
+.shot-frame{border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; cursor:zoom-in; max-width:640px}
+.shot-frame img{display:block; width:100%}
+.shot-caption{display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-faint); margin-top:6px}
+
+/* Retries */
+.retry-attempt{display:flex; align-items:center; gap:10px; padding:6px 0; font-size:13px}
+.retry-attempt b{width:80px}
+.retry-attempt .dur{margin-left:auto; color:var(--text-faint); font-variant-numeric:tabular-nums}
+
+/* Environment */
+.env-groups{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+@media (max-width:900px){.env-groups{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:600px){.env-groups{grid-template-columns:1fr}}
+.env-group h4{font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-faint); margin-bottom:9px; padding-bottom:8px; border-bottom:1px solid var(--border)}
+.env-kv{display:flex; justify-content:space-between; gap:10px; padding:5px 0; font-size:12.8px}
+.env-kv span{color:var(--text-muted)}
+.env-kv b{font-weight:600; text-align:right}
+
+/* Lightbox */
+.lightbox{position:fixed; inset:0; background:rgba(6,8,14,.88); display:none; align-items:center; justify-content:center; z-index:200; padding:40px}
+.lightbox.open{display:flex}
+.lightbox img{max-width:100%; max-height:100%; border-radius:8px; box-shadow:0 20px 60px rgba(0,0,0,.5); transition:transform .18s}
+.lightbox-bar{position:absolute; top:18px; left:0; right:0; display:flex; justify-content:space-between; align-items:center; padding:0 26px; color:#e8ebf5; font-size:13px}
+.lightbox-btn{background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); color:#fff; width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center}
+.lightbox-nav{position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); color:#fff; width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:18px}
+.lightbox-nav.prev{left:20px} .lightbox-nav.next{right:20px}
+
+footer{padding:40px 0 60px; text-align:center; color:var(--text-faint); font-size:12px}
+footer b{color:var(--text-muted)}
+
+.truncate-note{font-size:11.5px; color:var(--broken); background:color-mix(in srgb, var(--broken-fill) 12%, transparent); border:1px solid color-mix(in srgb, var(--broken-fill) 35%, transparent); padding:6px 10px; border-radius:7px; margin-bottom:8px; display:inline-block}
+</style>
+</head>
+<body>
+
+<div class="topbar no-print">
+  <div class="topbar-inner">
+    <div class="brand"><span>Open<b>QA</b></span><span class="divider"></span><span class="kind">Execution Report</span></div>
+    <nav class="topnav">
+      <a href="#summary">Summary</a>
+      <a href="#failures">Failures</a>
+      <a href="#features">Features</a>
+      <a href="#tests">Tests</a>
+      <a href="#environment">Environment</a>
+    </nav>
+    <div class="topbar-actions">
+      <button class="btn" id="expandAllBtn">Expand all</button>
+      <button class="btn" id="collapseAllBtn">Collapse all</button>
+      <button class="btn icon" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="hero-card">
+      <div class="hero-left">
+        <div class="eyebrow">Denali Automation · Mobile Regression</div>
+        <h1>Execution #142</h1>
+        <div class="meta-line">
+          <span>26 Jul 2026 · 10:14 PM</span>
+          <span class="dot"></span>
+          <span>Duration 1h 42m 36s</span>
+          <span class="dot"></span>
+          <span>Branch <b style="color:var(--text)">main</b></span>
+          <span class="dot"></span>
+          <span>Environment <b style="color:var(--text)">QA</b></span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <span class="status-pill FAILED">Failed</span>
+        <div class="hero-meta-grid">
+          <span>Commit</span><b>a8f92c1</b>
+          <span>Platform</span><b>Android</b>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="kpi-grid" id="summary">
+    <div class="kpi"><div class="eyebrow">Total</div><b class="tnum">60</b></div>
+    <div class="kpi pass"><div class="eyebrow">Passed</div><b class="tnum">45</b></div>
+    <div class="kpi fail"><div class="eyebrow">Failed</div><b class="tnum">8</b></div>
+    <div class="kpi broken"><div class="eyebrow">Broken</div><b class="tnum">3</b></div>
+    <div class="kpi skip"><div class="eyebrow">Skipped</div><b class="tnum">4</b></div>
+    <div class="kpi"><div class="eyebrow">Pass rate</div><b class="tnum">75.0%</b></div>
+    <div class="kpi"><div class="eyebrow">Duration</div><b class="tnum">1h 42m</b></div>
+  </section>
+
+  <section class="block">
+    <div class="two-col">
+      <div class="card">
+        <div class="section-head"><h2>Result distribution</h2></div>
+        <div class="donut-wrap">
+          <svg width="176" height="176" viewBox="0 0 176 176" role="img" aria-label="Result distribution donut chart">
+            <g transform="rotate(-90 88 88)" id="donutArcs"></g>
+            <circle cx="88" cy="88" r="52" fill="var(--surface)"></circle>
+            <text x="88" y="83" text-anchor="middle" font-size="26" font-weight="800" fill="var(--text)" font-family="inherit">60</text>
+            <text x="88" y="101" text-anchor="middle" font-size="10.5" letter-spacing="1" fill="var(--text-faint)" font-family="inherit">TOTAL</text>
+          </svg>
+          <div class="legend">
+            <div class="legend-row"><span class="sw" style="background:var(--pass-fill)"></span>Passed<b class="tnum">45</b><span class="pct tnum">75.0%</span></div>
+            <div class="legend-row"><span class="sw" style="background:var(--fail-fill)"></span>Failed<b class="tnum">8</b><span class="pct tnum">13.3%</span></div>
+            <div class="legend-row"><span class="sw" style="background:var(--broken-fill)"></span>Broken<b class="tnum">3</b><span class="pct tnum">5.0%</span></div>
+            <div class="legend-row"><span class="sw" style="background:var(--skip-fill)"></span>Skipped<b class="tnum">4</b><span class="pct tnum">6.7%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-head"><h2>Failure analysis</h2><span class="hint">click to filter failures</span></div>
+        <div id="failureAnalysis"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="failures">
+    <div class="section-head"><h2>Failed &amp; broken tests</h2><span class="hint">11 of 60 need attention — investigate these first</span></div>
+    <div id="failedList"></div>
+  </section>
+
+  <section class="block" id="features">
+    <div class="section-head"><h2>Feature summary</h2><span class="hint">click a row to see its scenarios</span></div>
+    <div class="card" style="padding:8px 20px 16px">
+      <table class="feature-table">
+        <thead><tr><th>Feature</th><th>Total</th><th>Pass</th><th>Fail</th><th>Broken</th><th>Skip</th><th>Health</th></tr></thead>
+        <tbody id="featureTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="tests">
+    <div class="section-head"><h2>All tests</h2><span class="count-badge" id="testCount"></span></div>
+    <div class="card">
+      <div class="filter-bar">
+        <button class="chip active" data-status="all">All</button>
+        <button class="chip" data-status="PASSED">Passed</button>
+        <button class="chip" data-status="FAILED">Failed</button>
+        <button class="chip" data-status="BROKEN">Broken</button>
+        <button class="chip" data-status="SKIPPED">Skipped</button>
+        <select id="featureFilter"><option value="all">All features</option></select>
+        <input type="search" id="testSearch" placeholder="Search scenarios…" />
+      </div>
+      <div id="testList"></div>
+    </div>
+  </section>
+
+  <section class="block" id="environment">
+    <div class="section-head"><h2>Environment &amp; execution context</h2></div>
+    <div class="card"><div class="env-groups" id="envGroups"></div></div>
+  </section>
+
+  <footer>
+    <div><b>OpenQA Dashboard</b> · Standalone Execution Report</div>
+    <div style="margin-top:4px">Report generated 26 Jul 2026, 11:58 PM &nbsp;·&nbsp; Execution #142 &nbsp;·&nbsp; All data in this file is sample data</div>
+  </footer>
+</div>
+
+<div class="lightbox no-print" id="lightbox">
+  <div class="lightbox-bar">
+    <span id="lightboxCaption"></span>
+    <button class="lightbox-btn" id="lightboxClose" aria-label="Close">✕</button>
+  </div>
+  <button class="lightbox-nav prev" id="lightboxPrev" aria-label="Previous screenshot">‹</button>
+  <img id="lightboxImg" alt="" />
+  <button class="lightbox-nav next" id="lightboxNext" aria-label="Next screenshot">›</button>
+</div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   escaping helper — never trust execution data
+   ============================================================ */
+function esc(s){
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+/* ============================================================
+   sample screenshot (inline SVG mockup, no external asset)
+   ============================================================ */
+function mockScreenshot(headline, sub, tone){
+  const bg = tone === "fail" ? "#fff1f2" : "#eef2f7";
+  const barColor = tone === "fail" ? "#dc2626" : "#111827";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="620">
+    <rect width="100%" height="100%" fill="${bg}"/>
+    <rect x="0" y="0" width="1000" height="64" fill="#0f1420"/>
+    <circle cx="34" cy="32" r="7" fill="#ff5f57"/><circle cx="58" cy="32" r="7" fill="#febc2e"/><circle cx="82" cy="32" r="7" fill="#28c840"/>
+    <text x="500" y="40" font-family="Arial" font-size="18" fill="#c9d2e6" text-anchor="middle">Resideo App — Denali Thermostat</text>
+    <rect x="60" y="110" width="880" height="430" rx="16" fill="#ffffff" stroke="#d7dce6"/>
+    <text x="96" y="168" font-family="Arial" font-size="24" font-weight="bold" fill="#111827">${esc(headline)}</text>
+    <rect x="96" y="200" width="808" height="2" fill="#e5e7eb"/>
+    <text x="96" y="250" font-family="Arial" font-size="17" fill="#4b5563">${esc(sub)}</text>
+    <rect x="96" y="${tone === "fail" ? 300 : 300}" width="808" height="86" rx="10" fill="${tone === "fail" ? "#fee2e2" : "#f0fdf4"}" stroke="${tone === "fail" ? "#fca5a5" : "#86efac"}"/>
+    <text x="126" y="352" font-family="Arial" font-size="16" fill="${tone === "fail" ? "#991b1b" : "#166534"}">${tone === "fail" ? "⚠ Expected alert banner was not rendered" : "✓ Expected state rendered correctly"}</text>
+    <text x="60" y="580" font-family="Arial" font-size="13" fill="#9ca3af">OpenQA sample evidence — synthetic screenshot, no real device data</text>
+  </svg>`;
+  // btoa() only accepts Latin1 - the SVG mockup text can contain unicode
+  // glyphs (✓, ⚠), so UTF-8 encode the bytes first.
+  const utf8Bytes = new TextEncoder().encode(svg);
+  let binary = "";
+  utf8Bytes.forEach(b => binary += String.fromCharCode(b));
+  return "data:image/svg+xml;base64," + btoa(binary);
+}
+
+/* ============================================================
+   REPORT MODEL — this is the single source the whole page renders from.
+   In production this is emitted once by the report generator from the
+   same canonical execution model the dashboard itself reads — never
+   recomputed independently.
+   ============================================================ */
+const REPORT = {
+  execution: { id: "142", project: "Denali Automation", suite: "Mobile Regression", branch: "main", commit: "a8f92c1", environment: "QA", platform: "Android", date: "26 Jul 2026 · 10:14 PM", duration: "1h 42m 36s", status: "FAILED" },
+  summary: { total: 60, passed: 45, failed: 8, broken: 3, skipped: 4, passRate: 75.0 },
+  failureCategories: [
+    { name: "Assertion Failure", count: 3 },
+    { name: "Element Not Found", count: 2 },
+    { name: "Timeout", count: 2 },
+    { name: "Appium / Device", count: 1 },
+    { name: "Environment", count: 1 },
+    { name: "Application Crash", count: 1 },
+  ],
+  environment: [
+    { section: "Execution", values: { "Project": "Denali Automation", "Suite": "Mobile Regression", "Execution ID": "#142", "Environment": "QA", "Triggered By": "Swadhin", "Trigger Source": "OpenQA Dashboard" } },
+    { section: "Source", values: { "Branch": "main", "Commit": "a8f92c1", "Repository": "denali-pom-framework" } },
+    { section: "Execution Machine", values: { "Agent": "MAC-LAB-03", "OS": "macOS 15.5", "Architecture": "arm64", "Java": "21", "Maven": "3.9.9", "Appium": "2.x" } },
+    { section: "Mobile Device", values: { "Platform": "Android", "Device ID": "R5CX123456", "Brand": "Samsung", "Model": "Galaxy S24", "OS Version": "Android 15" } },
+    { section: "Application", values: { "App": "Resideo", "App Version": "6.14.0", "Build": "20260726.1" } },
+    { section: "Custom", values: { "Team": "System Test", "Lab": "Bangalore Lab", "Product": "Denali" } },
+  ],
+  features: [
+    { name: "System Mode", total: 8, passed: 8, failed: 0, broken: 0, skipped: 0 },
+    { name: "Fan Mode", total: 8, passed: 6, failed: 2, broken: 0, skipped: 0 },
+    { name: "Setpoint Changes", total: 10, passed: 9, failed: 1, broken: 0, skipped: 0 },
+    { name: "Alerts & Notifications", total: 10, passed: 7, failed: 2, broken: 1, skipped: 0 },
+    { name: "Humidification", total: 6, passed: 3, failed: 1, broken: 1, skipped: 1 },
+    { name: "Scheduling", total: 7, passed: 5, failed: 1, broken: 0, skipped: 1 },
+    { name: "Device Settings", total: 6, passed: 4, failed: 1, broken: 1, skipped: 0 },
+    { name: "Authentication", total: 5, passed: 3, failed: 0, broken: 0, skipped: 2 },
+  ],
+  // Hand-authored "hero" scenarios exercising every report component.
+  // The remaining rows needed to reach each feature's totals are filled
+  // in programmatically below (generateFillerTests) with lighter detail.
+  heroTests: [
+    {
+      id: "t-lowbatt", name: "Verify Low Battery Alert", feature: "Alerts & Notifications", status: "FAILED", duration: "31.6s",
+      story: "Battery Alerts", severity: "Critical", owner: "Automation Team",
+      params: { device: "Samsung Galaxy S24", environment: "QA" },
+      steps: [
+        { name: "Launch Resideo application", status: "PASSED", duration: "3.2s" },
+        { name: "Login with valid credentials", status: "PASSED", duration: "4.8s" },
+        { name: "Select thermostat", status: "PASSED", duration: "2.1s" },
+        { name: "Navigate to Alerts", status: "PASSED", duration: "1.7s" },
+        { name: "Trigger low battery condition", status: "PASSED", duration: "8.4s" },
+        { name: "Verify Low Battery alert", status: "FAILED", duration: "10.1s", expected: "Low Battery alert banner visible", actual: "Alert was not displayed after 10s timeout" },
+      ],
+      failure: {
+        category: "Element Not Found",
+        message: "Expected Low Battery alert but element was not visible after 10 seconds.",
+        trace:
+`org.openqa.selenium.TimeoutException: Expected condition failed: waiting for visibility of element located by By.id: alert_banner_low_battery (tried for 10 second(s) with 500 milliseconds interval)
+    at org.openqa.selenium.support.ui.WebDriverWait.timeoutException(WebDriverWait.java:83)
+    at org.openqa.selenium.support.ui.FluentWait.until(FluentWait.java:229)
+    at com.resideo.pom.pages.AlertPage.verifyLowBattery(AlertPage.java:184)
+    at com.resideo.stepdefs.AlertSteps.verifyLowBattery(AlertSteps.java:92)
+    at ✽.Verify Low Battery alert(alerts.feature:41)`,
+      },
+      attachments: {
+        screenshot: { name: "failure-alert-banner.png", tone: "fail", headline: "Alerts & Notifications", sub: "No Low Battery alert displayed", timestamp: "22:14:31" },
+        logs: {
+          "Test Log": [
+            ["22:14:01","INFO","Starting execution #142"],
+            ["22:14:03","INFO","Device R5CX123456 detected"],
+            ["22:14:05","INFO","Starting Appium session"],
+            ["22:14:12","INFO","Launching application"],
+            ["22:14:18","INFO","Navigating to Alerts"],
+            ["22:14:22","INFO","Triggering low battery condition (mock battery service)"],
+            ["22:14:31","ERROR","Low Battery alert not found after 10000ms"],
+            ["22:14:31","INFO","Captured screenshot and page source"],
+          ],
+          "Appium Log": [
+            ["22:14:05","INFO","[Appium] Welcome to Appium v2.11.2"],
+            ["22:14:05","INFO","[Appium] Non-default server args: address=127.0.0.1"],
+            ["22:14:06","INFO","[BaseDriver] Event 'newSessionStarted' logged"],
+            ["22:14:12","INFO","[UiAutomator2] Starting App: com.resideo.app"],
+            ["22:14:22","WARN","[UiAutomator2] Waiting for idle timed out after 500ms"],
+            ["22:14:31","ERROR","[UiAutomator2] Could not find element with id 'alert_banner_low_battery'"],
+          ],
+          "Console": [
+            ["22:14:01","INFO","mvn test -Dtest=AlertsRunner -Denv=qa"],
+            ["22:14:31","ERROR","Tests run: 10, Failures: 2, Errors: 0, Skipped: 0"],
+          ],
+        },
+        json: { name: "device-api-response.json", content: {"status":"success","deviceId":"R5CX123456","mode":"heat","battery":{"level":14,"charging":false,"alertThreshold":20},"timestamp":"2026-07-26T22:14:22Z"} },
+      },
+    },
+    {
+      id: "t-setpoint", name: "Verify Cooling Setpoint", feature: "Setpoint Changes", status: "FAILED", duration: "22.4s",
+      story: "Setpoint Adjustment", severity: "Major", owner: "Automation Team",
+      params: { device: "Samsung Galaxy S24", environment: "QA" },
+      steps: [
+        { name: "Launch application", status: "PASSED", duration: "3.0s" },
+        { name: "Navigate to Setpoint screen", status: "PASSED", duration: "2.4s" },
+        { name: "Set cooling target to 22°C", status: "PASSED", duration: "5.1s" },
+        { name: "Verify setpoint applied", status: "FAILED", duration: "11.9s", expected: "22°C", actual: "23°C" },
+      ],
+      failure: {
+        category: "Assertion Failure",
+        message: "Expected cooling setpoint of 22°C but device reported 23°C.",
+        trace:
+`java.lang.AssertionError: expected [22.0] but found [23.0]
+    at org.testng.Assert.fail(Assert.java:96)
+    at org.testng.Assert.failNotEquals(Assert.java:1050)
+    at com.resideo.stepdefs.SetpointSteps.verifySetpointApplied(SetpointSteps.java:58)
+    at ✽.Verify setpoint applied(setpoints.feature:22)`,
+      },
+      attachments: {
+        xml: { name: "device-config.xml", content: `<device>\n  <mode>cool</mode>\n  <setpoint unit="celsius">23.0</setpoint>\n  <requestedSetpoint unit="celsius">22.0</requestedSetpoint>\n  <firmware>4.2.1</firmware>\n</device>` },
+      },
+    },
+    {
+      id: "t-devinfo", name: "Verify Device Information", feature: "Device Settings", status: "BROKEN", duration: "8.9s",
+      story: "Device Metadata", severity: "Normal", owner: "Automation Team",
+      params: { device: "Samsung Galaxy S24", environment: "QA" },
+      steps: [
+        { name: "Launch application", status: "PASSED", duration: "3.1s" },
+        { name: "Open Device Settings", status: "PASSED", duration: "1.8s" },
+        { name: "Read device metadata", status: "BROKEN", duration: "4.0s", expected: "Appium session responds", actual: "Session terminated unexpectedly" },
+      ],
+      failure: {
+        category: "Appium / Device",
+        message: "Appium session terminated unexpectedly while reading device metadata.",
+        trace:
+`io.appium.java_client.remote.SessionNotCreatedException: A new session could not be created. (Original error: Could not proxy command to remote server. Original error: socket hang up)
+    at io.appium.java_client.AppiumDriver.execute(AppiumDriver.java:214)
+    at com.resideo.pom.pages.DeviceSettingsPage.readMetadata(DeviceSettingsPage.java:71)
+    at ✽.Read device metadata(device_settings.feature:15)`,
+      },
+    },
+    {
+      id: "t-offlinerecovery", name: "Verify Offline Recovery", feature: "Scheduling", status: "PASSED", duration: "18.7s",
+      story: "Connectivity Recovery", severity: "Major", owner: "Automation Team",
+      params: { device: "Samsung Galaxy S24", environment: "QA" },
+      steps: [
+        { name: "Disable network", status: "PASSED", duration: "1.1s" },
+        { name: "Trigger reconnect", status: "PASSED", duration: "6.2s" },
+        { name: "Verify schedule resumes", status: "PASSED", duration: "11.4s" },
+      ],
+      retries: [
+        { attempt: 1, status: "FAILED", duration: "24.3s" },
+        { attempt: 2, status: "FAILED", duration: "22.8s" },
+        { attempt: 3, status: "PASSED", duration: "18.7s" },
+      ],
+    },
+    {
+      id: "t-fanauto", name: "Verify Fan Auto Mode Cycles Correctly", feature: "Fan Mode", status: "PASSED", duration: "12.6s",
+      story: "Fan Control", severity: "Normal", owner: "Automation Team",
+      params: { device: "Samsung Galaxy S24", environment: "QA" },
+      steps: [
+        { name: "Launch application", status: "PASSED", duration: "2.9s" },
+        { name: "Set fan mode to Auto", status: "PASSED", duration: "3.4s" },
+        { name: "Simulate temperature rise", status: "PASSED", duration: "4.0s" },
+        { name: "Verify fan engages", status: "PASSED", duration: "2.3s" },
+      ],
+    },
+    {
+      id: "t-fanmanual", name: "Verify Manual Fan Speed Override", feature: "Fan Mode", status: "FAILED", duration: "14.2s",
+      story: "Fan Control", severity: "Major", owner: "Automation Team",
+      params: { device: "Samsung Galaxy S24", environment: "QA" },
+      steps: [
+        { name: "Launch application", status: "PASSED", duration: "2.7s" },
+        { name: "Set fan speed to High", status: "PASSED", duration: "3.9s" },
+        { name: "Verify fan speed indicator", status: "FAILED", duration: "7.6s", expected: "HIGH", actual: "MEDIUM" },
+      ],
+      failure: { category: "Assertion Failure", message: "Fan speed indicator shows MEDIUM after setting HIGH.", trace: `java.lang.AssertionError: expected [HIGH] but found [MEDIUM]\n    at com.resideo.stepdefs.FanSteps.verifyFanSpeed(FanSteps.java:44)` },
+    },
+    {
+      id: "t-humid", name: "Verify Humidification Target Reached", feature: "Humidification", status: "BROKEN", duration: "9.8s",
+      story: "Humidification Control", severity: "Major", owner: "Automation Team",
+      params: { device: "Samsung Galaxy S24", environment: "QA" },
+      steps: [
+        { name: "Launch application", status: "PASSED", duration: "2.6s" },
+        { name: "Set humidity target", status: "PASSED", duration: "3.1s" },
+        { name: "Poll humidity sensor", status: "BROKEN", duration: "4.1s", expected: "Sensor reachable", actual: "Sensor connection reset" },
+      ],
+      failure: { category: "Environment", message: "Humidity sensor connection reset unexpectedly during polling.", trace: `java.net.SocketException: Connection reset\n    at com.resideo.iot.SensorClient.poll(SensorClient.java:33)\n    at com.resideo.stepdefs.HumiditySteps.pollSensor(HumiditySteps.java:29)` },
+    },
+    {
+      id: "t-auth1", name: "Verify SSO Login Flow", feature: "Authentication", status: "SKIPPED", duration: "0.0s",
+      story: "Authentication", severity: "Normal", owner: "Automation Team",
+      params: { environment: "QA" },
+      steps: [], skipReason: "SSO not yet enabled for the QA tenant — tracked in DENALI-2291.",
+    },
+    {
+      id: "t-devinfo2", name: "Verify Legacy Device Pairing", feature: "Authentication", status: "SKIPPED", duration: "0.0s",
+      story: "Authentication", severity: "Minor", owner: "Automation Team",
+      params: { environment: "QA" },
+      steps: [], skipReason: "Legacy pairing flow deprecated — scheduled for removal.",
+    },
+  ],
+};
+
+/* Fill each feature up to its declared totals with lighter-weight rows so
+   the Tests browser realistically reflects all 60 scenarios. */
+function generateFillerTests(){
+  const generic = [
+    ["Verify {f} loads correctly","PASSED"],
+    ["Verify {f} default state","PASSED"],
+    ["Verify {f} responds to user input","PASSED"],
+    ["Verify {f} persists after app restart","PASSED"],
+    ["Verify {f} under low connectivity","PASSED"],
+    ["Verify {f} accessibility labels","PASSED"],
+    ["Verify {f} boundary values","PASSED"],
+  ];
+  const out = [];
+  REPORT.features.forEach(f => {
+    const already = REPORT.heroTests.filter(t => t.feature === f.name);
+    const need = f.total - already.length;
+    const already_p = already.filter(t=>t.status==="PASSED").length;
+    const already_f = already.filter(t=>t.status==="FAILED").length;
+    const already_b = already.filter(t=>t.status==="BROKEN").length;
+    const already_s = already.filter(t=>t.status==="SKIPPED").length;
+    const remaining = { PASSED: f.passed-already_p, FAILED: f.failed-already_f, BROKEN: f.broken-already_b, SKIPPED: f.skipped-already_s };
+    let gi = 0, n = 0;
+    ["PASSED","FAILED","BROKEN","SKIPPED"].forEach(status=>{
+      for(let i=0;i<remaining[status];i++){
+        n++;
+        const label = generic[gi % generic.length][0].replace("{f}", f.name);
+        gi++;
+        out.push({
+          id: "gen-"+f.name.replace(/\s+/g,"")+"-"+n, name: label, feature: f.name, status,
+          duration: (2 + Math.random()*9).toFixed(1)+"s",
+          story: f.name, severity: "Normal", owner: "Automation Team", params: { environment: "QA" },
+          steps: [
+            { name: "Launch application", status: "PASSED", duration: "2.1s" },
+            { name: "Navigate to "+f.name, status: "PASSED", duration: "1.6s" },
+            { name: "Perform action", status: status==="SKIPPED" ? "SKIPPED" : (status==="PASSED"?"PASSED":status), duration: "3.4s" },
+            { name: "Verify result", status: status==="SKIPPED" ? "SKIPPED" : (status==="PASSED"?"PASSED":status), duration: "2.9s" },
+          ],
+          skipReason: status==="SKIPPED" ? "Skipped by suite configuration." : undefined,
+          failure: status==="FAILED" || status==="BROKEN" ? { category: status==="FAILED"?"Assertion Failure":"Appium / Device", message: "Synthetic sample failure for demonstration purposes.", trace: `AssertionError: sample failure in ${esc(label)}\n    at com.resideo.stepdefs.Steps.verify(Steps.java:1)` } : undefined,
+        });
+      }
+    });
+  });
+  return out;
+}
+
+const ALL_TESTS = [...REPORT.heroTests, ...generateFillerTests()];
+
+/* ============================================================
+   RENDER: donut
+   ============================================================ */
+(function renderDonut(){
+  const s = REPORT.summary;
+  const segs = [
+    { v: s.passed, color: "var(--pass-fill)" },
+    { v: s.failed, color: "var(--fail-fill)" },
+    { v: s.broken, color: "var(--broken-fill)" },
+    { v: s.skipped, color: "var(--skip-fill)" },
+  ];
+  const r = 70, cx = 88, cy = 88, circ = 2*Math.PI*r;
+  let offset = 0;
+  const g = document.getElementById("donutArcs");
+  segs.forEach(seg=>{
+    if(seg.v <= 0) return;
+    const frac = seg.v / s.total;
+    const len = circ * frac;
+    const circle = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    circle.setAttribute("cx", cx); circle.setAttribute("cy", cy); circle.setAttribute("r", r);
+    circle.setAttribute("fill", "none");
+    circle.setAttribute("stroke", seg.color);
+    circle.setAttribute("stroke-width", "22");
+    circle.setAttribute("stroke-dasharray", `${len} ${circ-len}`);
+    circle.setAttribute("stroke-dashoffset", -offset);
+    g.appendChild(circle);
+    offset += len;
+  });
+})();
+
+/* ============================================================
+   RENDER: failure analysis
+   ============================================================ */
+(function renderFailureAnalysis(){
+  const max = Math.max(...REPORT.failureCategories.map(c=>c.count));
+  const el = document.getElementById("failureAnalysis");
+  el.innerHTML = REPORT.failureCategories.map(c => `
+    <div class="fa-row clickable" data-cat="${esc(c.name)}">
+      <span class="fa-name">${esc(c.name)}</span>
+      <span class="fa-bar"><i style="width:${(c.count/max*100).toFixed(0)}%"></i></span>
+      <b class="tnum">${c.count}</b>
+    </div>`).join("");
+  el.querySelectorAll(".fa-row").forEach(row=>{
+    row.addEventListener("click", ()=>{
+      document.getElementById("testSearch").value = "";
+      setStatusFilter("all");
+      document.getElementById("featureFilter").value = "all";
+      window.__categoryFilter = row.dataset.cat;
+      renderTestList();
+      document.getElementById("tests").scrollIntoView({behavior:"smooth"});
+    });
+  });
+})();
+
+/* ============================================================
+   RENDER: failed/broken list (top)
+   ============================================================ */
+(function renderFailedList(){
+  const rows = ALL_TESTS.filter(t=>t.status==="FAILED"||t.status==="BROKEN");
+  document.getElementById("failedList").innerHTML = rows.map(t => `
+    <details class="fail-item" data-testid="${esc(t.id)}">
+      <summary>
+        <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="status-dot ${t.status}"></span>
+        <span class="ftitle">${esc(t.name)}</span>
+        <span class="fcat">${esc(t.feature)}${t.failure ? " · " + esc(t.failure.category) : ""}</span>
+        <span class="fdur tnum">${esc(t.duration)}</span>
+      </summary>
+      <div class="body">${renderScenarioDetail(t)}</div>
+    </details>`).join("");
+  wireDynamicContent(document.getElementById("failedList"));
+})();
+
+/* ============================================================
+   RENDER: feature table
+   ============================================================ */
+(function renderFeatureTable(){
+  const body = document.getElementById("featureTableBody");
+  body.innerHTML = REPORT.features.map((f,i) => {
+    const pct = ((f.passed/f.total)*100);
+    const color = pct >= 90 ? "var(--pass-fill)" : pct >= 70 ? "var(--skip-fill)" : "var(--fail-fill)";
+    return `
+    <tr class="feature-row" data-idx="${i}">
+      <td><b>${esc(f.name)}</b></td>
+      <td class="tnum">${f.total}</td>
+      <td class="tnum" style="color:var(--pass)">${f.passed}</td>
+      <td class="tnum" style="color:var(--fail)">${f.failed}</td>
+      <td class="tnum" style="color:var(--broken)">${f.broken}</td>
+      <td class="tnum" style="color:var(--skip)">${f.skipped}</td>
+      <td><span class="health-bar"><i style="width:${pct.toFixed(0)}%;background:${color}"></i></span><span class="tnum">${pct.toFixed(1)}%</span></td>
+    </tr>
+    <tr class="feature-detail-row"><td colspan="7"><div class="feature-detail" id="feat-detail-${i}"></div></td></tr>
+  `;}).join("");
+
+  body.querySelectorAll(".feature-row").forEach(row=>{
+    row.addEventListener("click", ()=>{
+      const idx = row.dataset.idx;
+      const detail = document.getElementById("feat-detail-"+idx);
+      const f = REPORT.features[idx];
+      if(!detail.classList.contains("open")){
+        const scenarios = ALL_TESTS.filter(t=>t.feature===f.name);
+        detail.innerHTML = scenarios.map(t=>`
+          <div class="mini-test">
+            <span class="status-dot ${t.status}"></span>
+            <span class="name">${esc(t.name)}</span>
+            <span class="dur tnum">${esc(t.duration)}</span>
+          </div>`).join("");
+      }
+      detail.classList.toggle("open");
+    });
+  });
+})();
+
+/* ============================================================
+   RENDER: scenario detail (shared by failed-list + tests browser)
+   ============================================================ */
+function renderScenarioDetail(t){
+  let html = `<div class="sd-meta">
+    <div><div class="eyebrow">Status</div><b class="status-dot ${t.status}" style="display:inline-block;margin-right:6px"></b><b>${esc(t.status)}</b></div>
+    <div><div class="eyebrow">Duration</div><b class="tnum">${esc(t.duration)}</b></div>
+    <div><div class="eyebrow">Feature</div><b>${esc(t.feature)}</b></div>
+    <div><div class="eyebrow">Story</div><b>${esc(t.story||"—")}</b></div>
+    <div><div class="eyebrow">Severity</div><b>${esc(t.severity||"—")}</b></div>
+    <div><div class="eyebrow">Owner</div><b>${esc(t.owner||"—")}</b></div>
+  </div>`;
+
+  if(t.params && Object.keys(t.params).length){
+    html += `<div class="eyebrow" style="margin-bottom:6px">Parameters</div><div style="font-size:12.8px;color:var(--text-muted);margin-bottom:12px">`+
+      Object.entries(t.params).map(([k,v])=>`${esc(k)} = <b style="color:var(--text)">${esc(v)}</b>`).join(" &nbsp;·&nbsp; ") + `</div>`;
+  }
+
+  if(t.status === "SKIPPED"){
+    html += `<div class="failure-box" style="border-color:color-mix(in srgb, var(--skip-fill) 35%, var(--border)); background:color-mix(in srgb, var(--skip-fill) 8%, var(--surface))">
+      <div class="eyebrow" style="color:var(--skip)">Skip reason</div>
+      <p>${esc(t.skipReason || "No reason provided.")}</p>
+    </div>`;
+    return html;
+  }
+
+  if(t.steps && t.steps.length){
+    html += `<div class="eyebrow" style="margin:14px 0 4px">Steps</div><ul class="steps">` + t.steps.map(s=>{
+      const icon = s.status==="PASSED" ? "✓" : s.status==="SKIPPED" ? "○" : (s.status==="BROKEN" ? "⚠" : "✕");
+      const color = s.status==="PASSED" ? "var(--pass)" : s.status==="SKIPPED" ? "var(--text-faint)" : (s.status==="BROKEN" ? "var(--broken)" : "var(--fail)");
+      let extra = "";
+      if(s.expected || s.actual){
+        extra = `<div class="step-fail-detail"><div><b>Expected</b>${esc(s.expected||"—")}</div><div><b>Actual</b>${esc(s.actual||"—")}</div></div>`;
+      }
+      return `<li><span style="color:${color};width:16px;text-align:center">${icon}</span><span class="sname">${esc(s.name)}</span><span class="sdur">${esc(s.duration)}</span></li>${extra}`;
+    }).join("") + `</ul>`;
+  }
+
+  if(t.retries && t.retries.length){
+    html += `<div class="eyebrow" style="margin:14px 0 6px">Retries</div><div>` + t.retries.map(r=>`
+      <div class="retry-attempt"><b>Attempt ${r.attempt}</b><span class="status-dot ${r.status}"></span><span>${esc(r.status)}</span><span class="dur">${esc(r.duration)}</span></div>
+    `).join("") + `<div class="retry-attempt" style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px"><b>Final</b><span class="status-dot PASSED"></span><span style="font-weight:700">PASSED</span><span class="dur">${t.retries.length-1} retries</span></div></div>`;
+  }
+
+  if(t.failure){
+    const traceId = "trace-"+t.id;
+    html += `<div class="failure-box">
+      <div class="eyebrow">Failure details</div>
+      <h4>${esc(t.failure.category)}</h4>
+      <p>${esc(t.failure.message)}</p>
+      <div class="eyebrow" style="margin:10px 0 4px">Stack trace</div>
+      <div class="trace-wrap collapsed" id="${traceId}">
+        <pre class="code">${esc(t.failure.trace)}</pre>
+        <div class="trace-fade"></div>
+      </div>
+      <div class="code-actions">
+        <button class="btn copy-btn" data-toggle-trace="${traceId}">Expand trace</button>
+        <button class="btn copy-btn" data-copy-trace="${traceId}">Copy stack trace</button>
+      </div>
+    </div>`;
+  }
+
+  if(t.attachments){
+    const tabs = [];
+    if(t.attachments.screenshot) tabs.push("Screenshot");
+    if(t.attachments.logs) tabs.push(...Object.keys(t.attachments.logs));
+    if(t.attachments.json) tabs.push("JSON");
+    if(t.attachments.xml) tabs.push("XML");
+    const uid = "att-"+t.id;
+    html += `<div class="eyebrow" style="margin:16px 0 4px">Attachments</div>
+      <div class="attach-tabs" data-uid="${uid}">` +
+        tabs.map((tab,i)=>`<button class="attach-tab ${i===0?"active":""}" data-tab="${esc(tab)}">${esc(tab)}</button>`).join("") +
+      `</div>`;
+
+    if(t.attachments.screenshot){
+      const s = t.attachments.screenshot;
+      const src = mockScreenshot(s.headline, s.sub, s.tone);
+      html += `<div class="attach-pane active" data-uid="${uid}" data-pane="Screenshot">
+        <div class="shot-frame" data-lightbox-src="${src}" data-lightbox-caption="${esc(s.name)}">
+          <img src="${src}" alt="${esc(s.name)}" />
+        </div>
+        <div class="shot-caption"><span>${esc(s.name)}</span><span>${esc(s.timestamp||"")}</span></div>
+      </div>`;
+    }
+    if(t.attachments.logs){
+      Object.entries(t.attachments.logs).forEach(([tabName, lines])=>{
+        const logId = uid+"-log-"+tabName.replace(/\s+/g,"");
+        html += `<div class="attach-pane" data-uid="${uid}" data-pane="${esc(tabName)}">
+          <div class="log-toolbar">
+            <input type="search" placeholder="Search logs…" data-log-search="${logId}" />
+            <button class="btn copy-btn" data-log-wrap="${logId}">Wrap</button>
+            <button class="btn copy-btn" data-log-copy="${logId}">Copy</button>
+          </div>
+          <div class="log-lines" id="${logId}">${lines.map(([time,level,msg])=>`<div class="log-line ${level}">${esc(time)}  ${level.padEnd(5)}  ${esc(msg)}</div>`).join("")}</div>
+        </div>`;
+      });
+    }
+    if(t.attachments.json){
+      html += `<div class="attach-pane" data-uid="${uid}" data-pane="JSON">
+        <div class="code-actions" style="margin-bottom:8px"><button class="btn copy-btn" data-copy-json="${uid}-json">Copy JSON</button></div>
+        <pre class="code" id="${uid}-json">${esc(JSON.stringify(t.attachments.json.content, null, 2))}</pre>
+      </div>`;
+    }
+    if(t.attachments.xml){
+      html += `<div class="attach-pane" data-uid="${uid}" data-pane="XML">
+        <div class="code-actions" style="margin-bottom:8px"><button class="btn copy-btn" data-copy-xml="${uid}-xml">Copy XML</button></div>
+        <pre class="code" id="${uid}-xml">${esc(t.attachments.xml.content)}</pre>
+      </div>`;
+    }
+  }
+
+  return html;
+}
+
+/* Wires up interactive bits inside a freshly-injected chunk of scenario detail HTML. */
+function wireDynamicContent(root){
+  root.querySelectorAll("[data-toggle-trace]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const wrap = document.getElementById(btn.dataset.toggleTrace);
+      wrap.classList.toggle("collapsed");
+      btn.textContent = wrap.classList.contains("collapsed") ? "Expand trace" : "Collapse trace";
+    });
+  });
+  root.querySelectorAll("[data-copy-trace]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const wrap = document.getElementById(btn.dataset.copyTrace);
+      copyText(wrap.querySelector("pre").textContent, btn);
+    });
+  });
+  root.querySelectorAll("[data-copy-json]").forEach(btn=> btn.addEventListener("click", ()=>copyText(document.getElementById(btn.dataset.copyJson).textContent, btn)));
+  root.querySelectorAll("[data-copy-xml]").forEach(btn=> btn.addEventListener("click", ()=>copyText(document.getElementById(btn.dataset.copyXml).textContent, btn)));
+
+  root.querySelectorAll(".attach-tabs").forEach(tabbar=>{
+    const uid = tabbar.dataset.uid;
+    tabbar.querySelectorAll(".attach-tab").forEach(tab=>{
+      tab.addEventListener("click", ()=>{
+        tabbar.querySelectorAll(".attach-tab").forEach(x=>x.classList.remove("active"));
+        tab.classList.add("active");
+        root.querySelectorAll(`.attach-pane[data-uid="${uid}"]`).forEach(p=>p.classList.toggle("active", p.dataset.pane===tab.dataset.tab));
+      });
+    });
+  });
+
+  root.querySelectorAll("[data-log-search]").forEach(input=>{
+    input.addEventListener("input", ()=>{
+      const box = document.getElementById(input.dataset.logSearch);
+      const q = input.value.toLowerCase();
+      box.querySelectorAll(".log-line").forEach(line=>{
+        const match = !q || line.textContent.toLowerCase().includes(q);
+        line.classList.toggle("hide", !match);
+        line.classList.toggle("hit", !!q && match);
+      });
+    });
+  });
+  root.querySelectorAll("[data-log-wrap]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      document.getElementById(btn.dataset.logWrap).classList.toggle("nowrap");
+    });
+  });
+  root.querySelectorAll("[data-log-copy]").forEach(btn=>{
+    btn.addEventListener("click", ()=>copyText(document.getElementById(btn.dataset.logCopy).innerText, btn));
+  });
+
+  root.querySelectorAll("[data-lightbox-src]").forEach(frame=>{
+    frame.addEventListener("click", ()=> openLightbox(frame.dataset.lightboxSrc, frame.dataset.lightboxCaption));
+  });
+}
+
+function copyText(text, btn){
+  const done = ()=>{ const orig = btn.textContent; btn.textContent = "Copied ✓"; setTimeout(()=>btn.textContent=orig, 1400); };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(done);
+  } else {
+    const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); }catch(e){}
+    document.body.removeChild(ta); done();
+  }
+}
+
+/* ============================================================
+   Lightbox
+   ============================================================ */
+let lightboxShots = [], lightboxIdx = 0;
+function collectShots(){
+  lightboxShots = Array.from(document.querySelectorAll("[data-lightbox-src]")).map(f=>({src:f.dataset.lightboxSrc, caption:f.dataset.lightboxCaption}));
+}
+function openLightbox(src, caption){
+  collectShots();
+  lightboxIdx = Math.max(0, lightboxShots.findIndex(s=>s.src===src));
+  showLightbox();
+}
+function showLightbox(){
+  const shot = lightboxShots[lightboxIdx];
+  document.getElementById("lightboxImg").src = shot.src;
+  document.getElementById("lightboxCaption").textContent = shot.caption + ` (${lightboxIdx+1} of ${lightboxShots.length})`;
+  document.getElementById("lightbox").classList.add("open");
+}
+document.getElementById("lightboxClose").addEventListener("click", ()=>document.getElementById("lightbox").classList.remove("open"));
+document.getElementById("lightbox").addEventListener("click", (e)=>{ if(e.target.id==="lightbox") document.getElementById("lightbox").classList.remove("open"); });
+document.getElementById("lightboxPrev").addEventListener("click", ()=>{ lightboxIdx = (lightboxIdx-1+lightboxShots.length)%lightboxShots.length; showLightbox(); });
+document.getElementById("lightboxNext").addEventListener("click", ()=>{ lightboxIdx = (lightboxIdx+1)%lightboxShots.length; showLightbox(); });
+document.getElementById("lightboxImg").addEventListener("click", (e)=>{
+  e.currentTarget.style.transform = e.currentTarget.style.transform ? "" : "scale(1.6)";
+});
+document.addEventListener("keydown", (e)=>{
+  if(!document.getElementById("lightbox").classList.contains("open")) return;
+  if(e.key==="Escape") document.getElementById("lightbox").classList.remove("open");
+  if(e.key==="ArrowLeft") document.getElementById("lightboxPrev").click();
+  if(e.key==="ArrowRight") document.getElementById("lightboxNext").click();
+});
+
+/* ============================================================
+   RENDER: tests browser + filters
+   ============================================================ */
+let currentStatusFilter = "all";
+function setStatusFilter(s){
+  currentStatusFilter = s;
+  document.querySelectorAll(".chip[data-status]").forEach(c=>c.classList.toggle("active", c.dataset.status===s));
+}
+(function populateFeatureFilter(){
+  const sel = document.getElementById("featureFilter");
+  REPORT.features.forEach(f=>{
+    const opt = document.createElement("option"); opt.value = f.name; opt.textContent = f.name; sel.appendChild(opt);
+  });
+})();
+
+function renderTestList(){
+  const q = document.getElementById("testSearch").value.trim().toLowerCase();
+  const featureVal = document.getElementById("featureFilter").value;
+  const catFilter = window.__categoryFilter;
+
+  const rows = ALL_TESTS.filter(t=>{
+    if(currentStatusFilter !== "all" && t.status !== currentStatusFilter) return false;
+    if(featureVal !== "all" && t.feature !== featureVal) return false;
+    if(catFilter && (!t.failure || t.failure.category !== catFilter)) return false;
+    if(q && !(t.name.toLowerCase().includes(q) || t.feature.toLowerCase().includes(q))) return false;
+    return true;
+  });
+
+  document.getElementById("testCount").textContent = `${rows.length} of ${ALL_TESTS.length} tests`;
+  const list = document.getElementById("testList");
+  list.innerHTML = rows.map(t => `
+    <details class="test-row" data-testid="${esc(t.id)}">
+      <summary>
+        <svg class="chev" width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="status-dot ${t.status}"></span>
+        <span class="name">${esc(t.name)}</span>
+        <span class="feat">${esc(t.feature)}</span>
+        <span class="dur tnum">${esc(t.duration)}</span>
+      </summary>
+      <div class="body"></div>
+    </details>`).join("");
+
+  list.querySelectorAll(".test-row").forEach(row=>{
+    row.addEventListener("toggle", ()=>{
+      if(row.open && !row.dataset.rendered){
+        const t = ALL_TESTS.find(x=>x.id===row.dataset.testid);
+        const body = row.querySelector(".body");
+        body.innerHTML = renderScenarioDetail(t);
+        wireDynamicContent(body);
+        row.dataset.rendered = "1";
+      }
+    });
+  });
+}
+document.querySelectorAll(".chip[data-status]").forEach(chip=>{
+  chip.addEventListener("click", ()=>{ window.__categoryFilter = null; setStatusFilter(chip.dataset.status); renderTestList(); });
+});
+document.getElementById("featureFilter").addEventListener("change", ()=>{ window.__categoryFilter = null; renderTestList(); });
+document.getElementById("testSearch").addEventListener("input", renderTestList);
+renderTestList();
+
+/* ============================================================
+   RENDER: environment
+   ============================================================ */
+(function renderEnvironment(){
+  document.getElementById("envGroups").innerHTML = REPORT.environment.map(g => `
+    <div class="env-group">
+      <h4>${esc(g.section)}</h4>
+      ${Object.entries(g.values).map(([k,v])=>`<div class="env-kv"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join("")}
+    </div>`).join("");
+})();
+
+/* ============================================================
+   Expand all / collapse all
+   ============================================================ */
+document.getElementById("expandAllBtn").addEventListener("click", ()=>{
+  document.querySelectorAll("details").forEach(d=>{ d.open = true; d.dispatchEvent(new Event("toggle")); });
+  document.querySelectorAll(".feature-detail").forEach((d,i)=>{
+    if(!d.classList.contains("open")) document.querySelectorAll(".feature-row")[i].click();
+  });
+});
+document.getElementById("collapseAllBtn").addEventListener("click", ()=>{
+  document.querySelectorAll("details").forEach(d=> d.open = false);
+  document.querySelectorAll(".feature-detail.open").forEach(d=> d.classList.remove("open"));
+});
+
+/* ============================================================
+   Theme toggle (persisted best-effort — file:// storage can be blocked,
+   so failures here are silently ignored and just fall back to session-only)
+   ============================================================ */
+(function themeInit(){
+  let saved = null;
+  try{ saved = localStorage.getItem("openqa-report-theme"); }catch(e){}
+  if(saved) document.documentElement.setAttribute("data-theme", saved);
+  updateThemeIcon();
+})();
+function updateThemeIcon(){
+  const attr = document.documentElement.getAttribute("data-theme");
+  const isDark = attr ? attr === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.getElementById("themeToggle").textContent = isDark ? "☀️" : "🌙";
+}
+document.getElementById("themeToggle").addEventListener("click", ()=>{
+  const current = document.documentElement.getAttribute("data-theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const next = current === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try{ localStorage.setItem("openqa-report-theme", next); }catch(e){}
+  updateThemeIcon();
+});
+</script>
+</body>
+</html>

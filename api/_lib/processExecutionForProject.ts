@@ -24,6 +24,8 @@ import { resolveSuiteId } from './suites.js'
 import { appendExecutionLog } from './executionLog.js'
 import { mergeRawResults } from './retryMerge.js'
 import { getServiceRoleClient } from './db.js'
+import { generateStandaloneReport } from './reportGenerator.js'
+import { storeReportArtifact, markReportGenerationFailed } from './reportStorage.js'
 
 export interface ProcessExecutionForProjectOptions {
   projectId: string
@@ -154,7 +156,7 @@ export async function processExecutionForProject(
   const supabase = getServiceRoleClient()
   const { data: project } = await supabase
     .from('projects')
-    .select('main_branch')
+    .select('name, main_branch')
     .eq('id', options.projectId)
     .single()
   const mainBranch = project?.main_branch ?? 'main'
@@ -239,6 +241,32 @@ export async function processExecutionForProject(
   // Unbounded ledger for the History page - every execution, regardless of
   // branch or the capped retention above (see supabase/migrations/0008_execution_log.sql).
   await appendExecutionLog(options.projectId, executionId, meta)
+
+  // Standalone HTML execution report - generated once, from the same
+  // effectiveRaw data the vendored summaries above were built from, so it
+  // can never diverge from what the dashboard itself shows. Every
+  // execution gets one regardless of branch (it's a per-execution
+  // artifact, independent of the branch-scoped aggregate). A generation
+  // failure must never fail the ingest itself - see reportStorage.ts.
+  try {
+    const report = generateStandaloneReport({
+      projectName: project?.name ?? 'Project',
+      suiteName,
+      executionId,
+      branch,
+      executedByName: options.executedByName ?? null,
+      executedByEmail: options.executedByEmail ?? null,
+      environment: raw.environment,
+      raw: effectiveRaw,
+      execution,
+      categories,
+      allureResultsDir: options.allureResultsDir,
+    })
+    await storeReportArtifact(options.projectId, executionId, report)
+  } catch (err) {
+    console.error('Standalone report generation failed', err)
+    await markReportGenerationFailed(options.projectId, executionId)
+  }
 
   return { execution, suiteId, branch, mergedIntoMainDashboard, isRetry, attempts: attemptCount }
 }

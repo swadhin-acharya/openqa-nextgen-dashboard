@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useParams, Link as RouterLink } from 'react-router-dom'
 import {
   Grid,
@@ -14,14 +15,29 @@ import {
   CircularProgress,
   LinearProgress,
   Box,
+  Snackbar,
 } from '@mui/material'
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
+import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded'
 import { Stack } from '../components/FlexStack'
 import { PageHeader } from '../components/layout/PageHeader'
 import { SectionCard } from '../components/common/SectionCard'
 import { StatusChip } from '../components/common/StatusChip'
 import { useProject } from '../lib/ProjectContext'
+import { useAuth } from '../lib/AuthContext'
 import { useExecutionDetail } from '../hooks/useExecutionDetail'
 import { formatNumber, formatPercent, formatDuration, formatDateTime } from '../utils/format'
+
+async function fetchReportBlob(projectId: string, executionId: string, accessToken: string, download: boolean): Promise<Blob> {
+  const res = await fetch(`/api/report?projectId=${projectId}&executionId=${executionId}${download ? '&download=true' : ''}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.error ?? 'Report not available')
+  }
+  return res.blob()
+}
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
@@ -36,10 +52,48 @@ function Stat({ label, value }: { label: string; value: string | number }) {
 
 export default function ExecutionReportPage() {
   const project = useProject()
+  const { session } = useAuth()
   const { executionId } = useParams<{ executionId: string }>()
   const { data, loading, error } = useExecutionDetail(project.projectId, executionId ?? '')
   const meta = data?.meta
   const live = data?.live
+  const [reportError, setReportError] = useState<string | null>(null)
+  const [reportBusy, setReportBusy] = useState<'view' | 'download' | null>(null)
+
+  async function handleViewReport() {
+    if (!session || !executionId) return
+    setReportBusy('view')
+    setReportError(null)
+    try {
+      const blob = await fetchReportBlob(project.projectId, executionId, session.access_token, false)
+      window.open(URL.createObjectURL(blob), '_blank')
+    } catch (err) {
+      setReportError(err instanceof Error ? err.message : 'Report not available')
+    } finally {
+      setReportBusy(null)
+    }
+  }
+
+  async function handleDownloadReport() {
+    if (!session || !executionId) return
+    setReportBusy('download')
+    setReportError(null)
+    try {
+      const blob = await fetchReportBlob(project.projectId, executionId, session.access_token, true)
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${project.slug}-${executionId}-report.html`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      setReportError(err instanceof Error ? err.message : 'Report not available')
+    } finally {
+      setReportBusy(null)
+    }
+  }
 
   return (
     <Stack>
@@ -53,9 +107,33 @@ export default function ExecutionReportPage() {
               : undefined
         }
         actions={
-          <Button component={RouterLink} to=".." variant="text" size="small">
-            ← Executions
-          </Button>
+          <>
+            {meta && (
+              <>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  startIcon={<DescriptionOutlinedIcon sx={{ fontSize: 16 }} />}
+                  disabled={reportBusy !== null}
+                  onClick={handleViewReport}
+                >
+                  {reportBusy === 'view' ? 'Opening…' : 'View Report'}
+                </Button>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  startIcon={<DownloadRoundedIcon sx={{ fontSize: 16 }} />}
+                  disabled={reportBusy !== null}
+                  onClick={handleDownloadReport}
+                >
+                  {reportBusy === 'download' ? 'Downloading…' : 'Download HTML'}
+                </Button>
+              </>
+            )}
+            <Button component={RouterLink} to=".." variant="text" size="small">
+              ← Executions
+            </Button>
+          </>
         }
       />
 
@@ -178,6 +256,14 @@ export default function ExecutionReportPage() {
           )}
         </Stack>
       )}
+
+      <Snackbar
+        open={!!reportError}
+        autoHideDuration={3500}
+        onClose={() => setReportError(null)}
+        message={reportError}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      />
     </Stack>
   )
 }
