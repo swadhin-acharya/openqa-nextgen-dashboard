@@ -51,7 +51,14 @@ export function Sidebar() {
           <Avatar
             src={org.logoUrl ?? undefined}
             variant="rounded"
-            sx={{ width: 28, height: 28, fontSize: '0.8rem', bgcolor: alpha(theme.palette.primary.main, 0.16), color: 'primary.light' }}
+            sx={{
+              width: 28,
+              height: 28,
+              fontSize: '0.8rem',
+              bgcolor: alpha(theme.palette.primary.main, 0.16),
+              color: 'primary.light',
+              '& .MuiAvatar-img': { objectFit: 'contain' },
+            }}
           >
             {org.name.charAt(0).toUpperCase()}
           </Avatar>

@@ -37,7 +37,14 @@ function OrgCard({ org }: { org: OrgRow }) {
         <Avatar
           src={org.logo_url ?? undefined}
           variant="rounded"
-          sx={{ width: 44, height: 44, bgcolor: alpha(theme.palette.primary.main, 0.16), color: 'primary.light', fontWeight: 700 }}
+          sx={{
+            width: 44,
+            height: 44,
+            bgcolor: alpha(theme.palette.primary.main, 0.16),
+            color: 'primary.light',
+            fontWeight: 700,
+            '& .MuiAvatar-img': { objectFit: 'contain' },
+          }}
         >
           {org.name.charAt(0).toUpperCase()}
         </Avatar>

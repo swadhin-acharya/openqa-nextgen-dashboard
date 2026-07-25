@@ -117,7 +117,11 @@ export default function NewOrgPage() {
             />
 
             <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-              <Avatar src={logoPreview ?? undefined} variant="rounded" sx={{ width: 48, height: 48 }} />
+              <Avatar
+                src={logoPreview ?? undefined}
+                variant="rounded"
+                sx={{ width: 48, height: 48, bgcolor: 'background.default', '& .MuiAvatar-img': { objectFit: 'contain' } }}
+              />
               <Button
                 component="label"
                 variant="outlined"
