@@ -13,6 +13,7 @@ import {
   alpha,
   useTheme,
 } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded'
 import { SectionCard } from '../common/SectionCard'
 import { StatusChip } from '../common/StatusChip'
@@ -22,6 +23,7 @@ import type { RecentExecutionRow } from '../../../processor/models.js'
 
 export function RecentExecutionsTable({ executions }: { executions: RecentExecutionRow[] }) {
   const theme = useTheme()
+  const navigate = useNavigate()
 
   return (
     <SectionCard title="Recent Executions" noPadding>
@@ -44,6 +46,7 @@ export function RecentExecutionsTable({ executions }: { executions: RecentExecut
             {executions.map((row) => (
               <TableRow
                 key={row.executionId}
+                onClick={() => navigate(`executions/${row.executionId}`)}
                 sx={{
                   cursor: 'pointer',
                   '&:hover': { bgcolor: theme.customTokens.hoverBackground },
@@ -87,6 +90,7 @@ export function RecentExecutionsTable({ executions }: { executions: RecentExecut
         <Button
           fullWidth
           size="small"
+          onClick={() => navigate('executions')}
           sx={{ color: 'text.secondary', fontWeight: 600, justifyContent: 'center' }}
         >
           View All Executions

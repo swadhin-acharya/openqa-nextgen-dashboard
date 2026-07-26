@@ -1,4 +1,5 @@
 import { Box, Typography, Chip, Button, alpha, useTheme } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 import { Stack } from '../FlexStack'
 import { SectionCard } from '../common/SectionCard'
 import { statusColors } from '../../theme/theme'
@@ -6,13 +7,14 @@ import type { FailureSummary } from '../../../processor/models.js'
 
 export function TopFailedTests({ failures }: { failures: FailureSummary[] }) {
   const theme = useTheme()
+  const navigate = useNavigate()
   const maxOccurrences = Math.max(...failures.map((f) => f.occurrences), 1)
 
   return (
     <SectionCard
       title="Top Failed Tests"
       actions={
-        <Button size="small" sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 600 }}>
+        <Button size="small" onClick={() => navigate('failure-analysis')} sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 600 }}>
           View All
         </Button>
       }
@@ -25,6 +27,7 @@ export function TopFailedTests({ failures }: { failures: FailureSummary[] }) {
             direction="row"
             alignItems="center"
             spacing={1.5}
+            onClick={() => navigate('failure-analysis')}
             sx={{
               p: 1,
               borderRadius: 1.5,

@@ -1,4 +1,5 @@
 import { Grid, Paper, Typography, LinearProgress, alpha, useTheme, Button } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 import { Stack } from '../FlexStack'
 import { statusColors } from '../../theme/theme'
 import { formatPercent } from '../../utils/format'
@@ -12,6 +13,7 @@ function healthColor(passRate: number) {
 
 export function FeatureHealthGrid({ features }: { features: FeatureSummary[] }) {
   const theme = useTheme()
+  const navigate = useNavigate()
 
   return (
     <Paper
@@ -20,7 +22,7 @@ export function FeatureHealthGrid({ features }: { features: FeatureSummary[] }) 
     >
       <Stack component="div" direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
         <Typography variant="h6">Feature Health</Typography>
-        <Button size="small" sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 600 }}>
+        <Button size="small" onClick={() => navigate('features')} sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 600 }}>
           View All Features
         </Button>
       </Stack>
@@ -31,6 +33,7 @@ export function FeatureHealthGrid({ features }: { features: FeatureSummary[] }) 
             <Grid key={feature.featureId} size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 12 / 6 }}>
               <Paper
                 elevation={0}
+                onClick={() => navigate(`tests?feature=${encodeURIComponent(feature.name)}`)}
                 sx={{
                   bgcolor: theme.palette.mode === 'dark' ? alpha('#ffffff', 0.02) : alpha('#12151f', 0.02),
                   border: `1px solid ${theme.palette.divider}`,
